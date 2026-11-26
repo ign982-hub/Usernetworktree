@@ -1,0 +1,3003 @@
+
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>安心後事通 HK Afterlife Guide V1.2 — 香港免費善終與防騙公益平台</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- QR Code Generator Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Google Fonts: Inter & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =========================================================
+       V1.2 核心設計系統與 WCAG AAA 無障礙變數
+       ========================================================= */
+    :root {
+      --bg-main: #FAF8F5;
+      --bg-card: #FFFFFF;
+      --bg-soft: #F1F5F9;
+      --text-main: #1E293B;
+      --text-muted: #475569;
+      --accent: #0F766E;
+      --accent-hover: #115E59;
+      --accent-soft: #CCFBF1;
+      --btn-active-text: #FFFFFF;
+      --na-bg: #475569;
+      --na-text: #FFFFFF;
+      --border-color: #CBD5E1;
+      --warn-bg: #FEF2F2;
+      --warn-border: #B91C1C;
+      --warn-text: #991B1B;
+      --err-bg: #FEF2F2;
+      --err-border: #DC2626;
+      --err-text: #991B1B;
+      --amber-bg: #FFFBEB;
+      --amber-border: #D97706;
+      --amber-text: #92400E;
+      --font-scale: 1;
+    }
+
+    /* 高對比黑底黃白字模式 (全面杜絕白字配亮黃/淺紅底) */
+    body.high-contrast {
+      --bg-main: #000000;
+      --bg-card: #121212;
+      --bg-soft: #1F1F1F;
+      --text-main: #FFFFFF;
+      --text-muted: #FDE047;
+      --accent: #FACC15;
+      --accent-hover: #EAB308;
+      --accent-soft: #292524;
+      --btn-active-text: #000000;
+      --na-bg: #CBD5E1;
+      --na-text: #000000;
+      --border-color: #FACC15;
+      --warn-bg: #2A0A0A;
+      --warn-border: #FF6B6B;
+      --warn-text: #FFD6D6;
+      --err-bg: #3B0A0A;
+      --err-border: #FF6B6B;
+      --err-text: #FFD6D6;
+      --amber-bg: #292000;
+      --amber-border: #FACC15;
+      --amber-text: #FDE047;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-size: calc(17px * var(--font-scale));
+      line-height: 1.65;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      overflow-x: hidden;
+    }
+
+    body.font-lg { --font-scale: 1.18; }
+    body.font-xl { --font-scale: 1.35; }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: 1rem;
+    }
+
+    .soft-box {
+      background-color: var(--bg-soft);
+      border: 1.5px solid var(--border-color);
+      border-radius: 0.875rem;
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: var(--btn-active-text);
+      min-height: 52px;
+      border-radius: 0.875rem;
+      font-weight: 700;
+      transition: transform 0.1s ease, background-color 0.15s ease;
+    }
+    .btn-primary:hover { background-color: var(--accent-hover); }
+    .btn-primary:active { transform: scale(0.98); }
+
+    /* 特大長者觸控選項卡 (Elder-Friendly 60px+ Option Tiles) */
+    .option-tile {
+      min-height: 60px;
+      border: 2px solid var(--border-color);
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border-radius: 0.875rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+    .option-tile:hover {
+      border-color: var(--accent);
+    }
+    .option-tile.selected {
+      border-color: var(--accent);
+      background-color: var(--accent-soft);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    .option-tile.na-selected {
+      border-color: var(--na-bg);
+      background-color: var(--bg-soft);
+      box-shadow: 0 0 0 2px var(--na-bg);
+      opacity: 0.94;
+    }
+    .option-tile.wrong-selected {
+      border-color: var(--err-border);
+      background-color: var(--err-bg);
+      color: var(--err-text);
+      box-shadow: 0 0 0 2px var(--err-border);
+    }
+
+    /* 視覺化大剔選方格 */
+    .big-check-box {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      border: 2.5px solid var(--text-main);
+      border-radius: 0.45rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.15rem;
+      background-color: var(--bg-card);
+      color: var(--accent);
+    }
+    .option-tile.selected .big-check-box {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      color: var(--btn-active-text);
+    }
+    .option-tile.na-selected .big-check-box {
+      background-color: var(--na-bg);
+      border-color: var(--na-bg);
+      color: var(--na-text);
+    }
+    .option-tile.wrong-selected .big-check-box {
+      background-color: var(--err-border);
+      border-color: var(--err-border);
+      color: #FFFFFF;
+    }
+
+    /* 導覽分頁按鈕 */
+    .nav-tab {
+      min-height: 54px;
+      border: 2px solid var(--border-color);
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border-radius: 0.875rem;
+      font-weight: 700;
+      padding: 0.55rem 0.9rem;
+      transition: all 0.15s ease;
+    }
+    .nav-tab.active {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      color: var(--btn-active-text);
+    }
+
+    /* 三態清單按鈕樣式 (無硬編碼色彩，高對比自動適配) */
+    .tri-btn-done {
+      border-color: var(--border-color);
+      background-color: var(--bg-card);
+      color: var(--text-main);
+    }
+    .tri-btn-done.is-active {
+      border-color: var(--accent);
+      background-color: var(--accent);
+      color: var(--btn-active-text);
+    }
+    .tri-btn-na {
+      border-color: var(--border-color);
+      background-color: var(--bg-card);
+      color: var(--text-main);
+    }
+    .tri-btn-na.is-active {
+      border-color: var(--na-bg);
+      background-color: var(--na-bg);
+      color: var(--na-text);
+    }
+
+    /* AI 用戶對話氣泡 */
+    .ai-user-bubble {
+      background-color: var(--accent);
+      color: var(--btn-active-text);
+    }
+
+    /* 警示框樣式 */
+    .warn-box {
+      background-color: var(--warn-bg);
+      border: 2.5px solid var(--warn-border);
+      color: var(--warn-text);
+      border-radius: 1rem;
+    }
+    .amber-box {
+      background-color: var(--amber-bg);
+      border: 2px solid var(--amber-border);
+      color: var(--amber-text);
+      border-radius: 1rem;
+    }
+
+    /* 語音錄音脈動 */
+    @keyframes pulseRing {
+      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
+      70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+    .recording-pulse {
+      animation: pulseRing 1.3s infinite;
+      background-color: #DC2626 !important;
+      color: #FFFFFF !important;
+    }
+
+    /* =========================================================
+       A4 專用列印樣式 (10mm x 10mm 粗黑方格，方便長者手寫打剔)
+       ========================================================= */
+    #print-area {
+      display: none;
+    }
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 14mm;
+      }
+      body, body.high-contrast {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        font-size: 13pt !important;
+        line-height: 1.5 !important;
+      }
+      #app-shell, #floating-ai-btn, #toast-container, .modal-backdrop {
+        display: none !important;
+      }
+      #print-area {
+        display: block !important;
+        color: #000000 !important;
+      }
+      .print-box-10mm {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 10mm;
+        height: 10mm;
+        min-width: 10mm;
+        border: 2px solid #000000;
+        margin-right: 4mm;
+        font-size: 15pt;
+        font-weight: 900;
+        vertical-align: middle;
+      }
+      .print-section {
+        border: 1.5px solid #000000;
+        padding: 5mm;
+        margin-bottom: 5mm;
+        page-break-inside: avoid;
+      }
+      .print-legal-banner {
+        border: 3px solid #000000;
+        padding: 5mm;
+        margin-bottom: 5mm;
+        background: #F3F4F6 !important;
+      }
+      .print-write-line {
+        border-bottom: 1.5px solid #000000;
+        min-height: 9mm;
+        margin-top: 2mm;
+        padding-top: 1mm;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- =========================================================
+       主應用程式外殼 (#app-shell)
+       ========================================================= -->
+  <div id="app-shell" class="min-h-screen flex flex-col">
+
+    <!-- 1. 頂部無障礙與 9 種語言控制列 (已修復標籤對稱結構) -->
+    <header class="sticky top-0 z-40 shadow-md border-b-2" style="background-color: var(--bg-card); border-color: var(--border-color);">
+      <div class="max-w-6xl mx-auto px-3 py-2.5">
+        <div class="flex flex-wrap items-center justify-between gap-2.5">
+          <!-- 品牌名稱 -->
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl sm:text-3xl" aria-hidden="true">🕊️</span>
+            <div>
+              <h1 id="ui-app-title" class="font-extrabold text-lg sm:text-xl leading-tight">安心後事通</h1>
+              <p id="ui-app-subtitle" class="text-xs sm:text-sm opacity-80">HK Afterlife Guide V1.2｜零盈利公益平台</p>
+            </div>
+          </div>
+
+          <!-- 右側無障礙及多語言工具列 -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- 9 種語言選擇器 -->
+            <label for="lang-select" class="sr-only">Language</label>
+            <select id="lang-select" onchange="setLanguage(this.value)"
+              class="min-h-[44px] px-2.5 py-1.5 rounded-xl border-2 font-bold text-sm cursor-pointer"
+              style="background-color: var(--bg-soft); border-color: var(--border-color); color: var(--text-main);">
+              <option value="zh-HK">🇭🇰 繁體中文 (粵語)</option>
+              <option value="zh-CN">🇨🇳 简体中文 (普通话)</option>
+              <option value="zh-TW">🇹🇼 繁體中文 (台灣語／國語)</option>
+              <option value="en">🇬🇧 English</option>
+              <option value="id">🇮🇩 Bahasa Indonesia</option>
+              <option value="tl">🇵🇭 Tagalog (Filipino)</option>
+              <option value="ja">🇯🇵 日本語</option>
+              <option value="ko">🇰🇷 한국어</option>
+              <option value="th">🇹🇭 ภาษาไทย</option>
+            </select>
+
+            <!-- 字體大小三段切換 -->
+            <div class="inline-flex rounded-xl border-2 overflow-hidden" style="border-color: var(--border-color);">
+              <button type="button" onclick="setFontSize('base')" id="btn-font-base" class="px-2.5 min-h-[44px] text-sm font-bold" title="標準字">A</button>
+              <button type="button" onclick="setFontSize('lg')" id="btn-font-lg" class="px-2.5 min-h-[44px] text-base font-bold border-l" style="border-color: var(--border-color);" title="大字">A+</button>
+              <button type="button" onclick="setFontSize('xl')" id="btn-font-xl" class="px-2.5 min-h-[44px] text-lg font-extrabold border-l" style="border-color: var(--border-color);" title="特大字">A++</button>
+            </div>
+
+            <!-- 高對比黑底黃字切換 -->
+            <button type="button" onclick="toggleContrast()" id="btn-contrast"
+              class="min-h-[44px] px-3 rounded-xl border-2 font-bold text-sm"
+              style="background-color: var(--bg-soft); border-color: var(--border-color);">
+              🌓 <span id="ui-contrast-label">高對比</span>
+            </button>
+
+            <!-- 語音速度切換 -->
+            <button type="button" onclick="toggleSpeechRate()" id="btn-speech-rate"
+              class="min-h-[44px] px-3 rounded-xl border-2 font-bold text-sm"
+              style="background-color: var(--bg-soft); border-color: var(--border-color);">
+              🔊 <span id="ui-rate-label">0.75x 慢讀</span>
+            </button>
+
+            <!-- 聽障無聲大字溝通卡 -->
+            <button type="button" onclick="openDeafModal()"
+              class="min-h-[44px] px-3 rounded-xl border-2 font-bold text-sm"
+              style="background-color: var(--amber-bg); border-color: var(--amber-border); color: var(--amber-text);">
+              👂 <span id="ui-deaf-btn">聽障溝通卡</span>
+            </button>
+
+            <!-- 即時分享 QR Code -->
+            <button type="button" onclick="openQrModal()"
+              class="min-h-[44px] px-3 rounded-xl border-2 font-bold text-sm"
+              style="background-color: var(--accent-soft); border-color: var(--accent); color: var(--text-main);">
+              📱 <span id="ui-qr-btn">分享 QR</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. 公益零私利 & 計劃可能變更或取消提醒橫幅 -->
+    <div class="max-w-6xl w-full mx-auto px-3 pt-3">
+      <div class="amber-box p-3.5 text-sm sm:text-base flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <strong id="ui-banner-title">🌱 零私利積福承諾與重要提醒：</strong>
+          <span id="ui-banner-text">本平台絕不收取任何金錢利益或佣金，鼓勵自願直接向有需要人士或香港合法註冊慈善機構捐贈。本構思及建議計劃或會因設計調整或不可抗力原因而修改、暫停或取消，敬請有關人士留意。</span>
+        </div>
+        <button type="button" id="btn-read-banner"
+          class="shrink-0 min-h-[44px] px-3 py-1.5 rounded-xl border-2 font-bold text-sm"
+          style="border-color: var(--amber-border); background-color: var(--bg-card); color: var(--text-main);">
+          🔊 <span class="ui-read-aloud">朗讀</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. 主導覽分頁 (8 大核心模組) -->
+    <nav class="max-w-6xl w-full mx-auto px-3 pt-3" aria-label="主選單">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="main-nav-grid">
+        <button type="button" onclick="switchTab('elder')" id="tab-elder" class="nav-tab active flex items-center justify-center gap-1.5 text-center">
+          <span>📝</span> <span id="nav-elder-lbl">長者交帶手冊</span>
+        </button>
+        <button type="button" onclick="switchTab('family')" id="tab-family" class="nav-tab flex items-center justify-center gap-1.5 text-center">
+          <span>✅</span> <span id="nav-family-lbl">家屬辦理清單</span>
+        </button>
+        <button type="button" onclick="switchTab('helper')" id="tab-helper" class="nav-tab flex items-center justify-center gap-1.5 text-center">
+          <span>🌍</span> <span id="nav-helper-lbl">外傭・旅客緊急</span>
+        </button>
+        <button type="button" onclick="switchTab('ai')" id="tab-ai" class="nav-tab flex items-center justify-center gap-1.5 text-center">
+          <span>🤖</span> <span id="nav-ai-lbl">AI 安心解說員</span>
+        </button>
+        <button type="button" onclick="switchTab('niche')" id="tab-niche" class="nav-tab flex items-center justify-center gap-1.5 text-center">
+          <span>📅</span> <span id="nav-niche-lbl">龕位每月日曆</span>
+        </button>
+        <button type="button" onclick="switchTab('quiz')" id="tab-quiz" class="nav-tab flex items-center justify-center gap-1.5 text-center">
+          <span>⚖️</span> <span id="nav-quiz-lbl">平安三寶 2026</span>
+        </button>
+        <button type="button" onclick="switchTab('directory')" id="tab-directory" class="nav-tab flex items-center justify-center gap-1.5 text-center">
+          <span>🛡️</span> <span id="nav-directory-lbl">防騙・宗教・租車</span>
+        </button>
+        <button type="button" onclick="switchTab('festival')" id="tab-festival" class="nav-tab flex items-center justify-center gap-1.5 text-center">
+          <span>⛰️</span> <span id="nav-festival-lbl">掃墓交通與行善</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- 4. 主內容視區 -->
+    <main class="max-w-6xl w-full mx-auto px-3 py-5 flex-1 space-y-6">
+
+      <!-- =====================================================
+           TAB 1: 長者《我的安心交帶手冊》(可多選 + 不適用 + A4 10mm列印)
+           ===================================================== -->
+      <section id="panel-elder" class="space-y-5">
+        <!-- 醒目無法律效力聲明 -->
+        <div class="warn-box p-4 sm:p-5 space-y-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="ui-elder-legal-title" class="font-extrabold text-lg sm:text-xl">⚠️ 重要法律效力聲明：本手冊沒有法律效力</h2>
+            <button type="button" id="btn-read-legal"
+              class="min-h-[44px] px-3 rounded-xl border-2 font-bold text-sm"
+              style="border-color: var(--warn-border); background-color: var(--bg-card); color: var(--text-main);">
+              🔊 <span class="ui-read-aloud">朗讀</span>
+            </button>
+          </div>
+          <p id="ui-elder-legal-body" class="text-sm sm:text-base font-medium">
+            本手冊只用作長者生前記錄個人意願、緊急聯絡及文件存放位置，方便家人或合法代理跟進。<strong>它絕不等同平安紙（遺囑）、持久授權書或 2026 年預設醫療指示。</strong>若本手冊與正式法律文件有任何抵觸，一切均以正式法律文件為準，避免日後遺產訴訟爭拗。所有填寫內容<strong>僅儲存於你的本機裝置</strong>，絕不上傳任何伺服器。
+          </p>
+        </div>
+
+        <!-- 頂部操作按鈕列 -->
+        <div class="card p-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 id="ui-elder-heading" class="font-extrabold text-xl sm:text-2xl">📝 我的安心交帶手冊（長者友善版）</h2>
+            <p id="ui-elder-sub" class="text-sm opacity-85 mt-1">
+              支援「可多項剔取」及「不適用 (N/A)」選擇；可按 🎤 講字輸入，或一鍵列印 A4 特大字（附 10mm 粗黑手寫格）。
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" onclick="printElderBooklet()" class="btn-primary px-4 py-2 flex items-center gap-2">
+              🖨️ <span id="ui-btn-print-elder">A4 特大字列印</span>
+            </button>
+            <button type="button" onclick="requestClearData('elder')"
+              class="min-h-[52px] px-4 py-2 rounded-xl border-2 font-bold"
+              style="border-color: var(--border-color); background-color: var(--bg-soft);">
+              🗑️ <span id="ui-btn-clear">清除重填</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 動態生成的長者手冊表單區 -->
+        <div id="elder-form-container" class="space-y-5"></div>
+      </section>
+
+      <!-- =====================================================
+           TAB 2: 家屬《辦理身後事 5 階段清單》(未辦 / 已完成 / 不適用)
+           ===================================================== -->
+      <section id="panel-family" class="hidden space-y-5">
+        <div class="card p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 id="ui-family-heading" class="font-extrabold text-xl sm:text-2xl">✅ 香港家人辦理身後事步驟清單（2026 版）</h2>
+              <p id="ui-family-sub" class="text-sm opacity-85 mt-1">
+                每個步驟均可按實況選擇「✓ 已完成」或「— 不適用 (N/A)」，並可一鍵複製文字進度報告發送給海外家人同步。
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" onclick="copyFamilyProgress()" class="btn-primary px-4 py-2 flex items-center gap-2">
+                📋 <span id="ui-btn-copy-wa">複製進度貼 WhatsApp</span>
+              </button>
+              <button type="button" onclick="printFamilyChecklist()"
+                class="min-h-[52px] px-4 py-2 rounded-xl border-2 font-bold flex items-center gap-2"
+                style="border-color: var(--accent); background-color: var(--accent-soft); color: var(--text-main);">
+                🖨️ <span id="ui-btn-print-family">A4 列印清單</span>
+              </button>
+              <button type="button" onclick="requestClearData('family')"
+                class="min-h-[52px] px-4 py-2 rounded-xl border-2 font-bold"
+                style="border-color: var(--border-color); background-color: var(--bg-soft);">
+                🗑️ <span class="ui-btn-reset">重設</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 動態進度條 -->
+          <div class="soft-box p-4 space-y-2">
+            <div class="flex flex-wrap justify-between items-center gap-2 font-bold">
+              <span id="family-progress-text">已完成 0 / 0 項適用步驟</span>
+              <span id="family-na-badge" class="text-sm px-2.5 py-0.5 rounded-full border" style="border-color: var(--border-color);">不適用：0 項</span>
+            </div>
+            <div class="w-full h-5 rounded-full overflow-hidden border" style="background-color: var(--bg-card); border-color: var(--border-color);">
+              <div id="family-progress-bar" class="h-full transition-all duration-300" style="width: 0%; background-color: var(--accent);"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 階段清單容器 -->
+        <div id="family-stages-container" class="space-y-5"></div>
+
+        <!-- 家屬其他／補充事項 -->
+        <div class="card p-4 sm:p-5 space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h3 class="font-extrabold text-lg">🗒️ 第六部分：其他／補充事項（家屬備忘與分工）</h3>
+            <button type="button" onclick="startDictation('family-notes', this)"
+              class="min-h-[44px] px-3 rounded-xl border-2 font-bold text-sm"
+              style="border-color: var(--accent); background-color: var(--accent-soft); color: var(--text-main);">
+              🎤 語音輸入
+            </button>
+          </div>
+          <textarea id="family-notes" rows="4" oninput="saveFamilyNotes(this.value)"
+            placeholder="例如：負責聯絡海外二哥的人員、已收到的政府收據編號、靈車／帛金紀錄、宗教師父聯絡備註..."
+            class="w-full p-3.5 rounded-xl border-2 text-base"
+            style="background-color: var(--bg-main); border-color: var(--border-color); color: var(--text-main);"></textarea>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           TAB 3: 外傭（工人姐姐）與訪港旅客緊急參考指南 (全 9 國語言)
+           ===================================================== -->
+      <section id="panel-helper" class="hidden space-y-5">
+        <div class="card p-4 sm:p-5 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 id="ui-helper-title" class="font-extrabold text-xl sm:text-2xl">🌍 留港外傭（工人姐姐）及旅客突發意外／身故緊急指南</h2>
+              <p id="ui-helper-subtitle" class="text-sm opacity-85 mt-1">
+                專為在港工作的外籍家庭傭工、僱主及訪港旅客而設。上方可切換 9 種語言，萬一發生突發意外可即時查閱官方權利、領事館及防騙步驟。
+              </p>
+            </div>
+            <button type="button" onclick="openEmergencyFlashcard()" class="btn-primary px-4 py-2 flex items-center gap-2">
+              🆘 <span id="ui-btn-show-card">顯示雙語特大求助卡</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 緊急電話速查卡 (支援 9 語) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="helper-hotlines-grid"></div>
+
+        <!-- 兩大情境指引：外傭 vs 訪港旅客 (支援 9 語) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" id="helper-scenarios-grid"></div>
+
+        <!-- 主要駐港領事館與支援機構 -->
+        <div class="card p-4 sm:p-5 space-y-3">
+          <h3 id="ui-consulate-title" class="font-extrabold text-lg sm:text-xl">🏛️ 主要駐港總領事館及外傭支援機構（防騙核實參考）</h3>
+          <div class="warn-box p-3 text-sm font-semibold" id="ui-helper-antiscam">
+            ⚠️ 防騙警示：領事館與香港勞工處絕不會透過陌生 WhatsApp 要求轉賬至個人戶口以「加快遺體運返或賠償審批」。外籍家庭傭工如在合約期內身故，標準僱傭合約規定僱主有責任承擔遺體及個人物品運返原居地之費用。
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="consulate-list"></div>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           TAB 4: AI 安心解說員 (支援 9 語零成本離線知識庫 + 安全 API 擴展)
+           ===================================================== -->
+      <section id="panel-ai" class="hidden space-y-5">
+        <div class="card p-4 sm:p-5 space-y-3">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 id="ui-ai-title" class="font-extrabold text-xl sm:text-2xl">🤖 AI 安心解說員（管理員角色）</h2>
+              <p id="ui-ai-desc" class="text-sm opacity-85 mt-1">
+                24 小時以平和、易明的粵語或你所選語言，為你解答香港 2026 善終法例、公眾龕位、防騙核實、海外失聯應急及外傭／旅客意外處理疑問。
+              </p>
+            </div>
+            <button type="button" onclick="toggleAiRoleExplain()" class="min-h-[44px] px-3 rounded-xl border-2 font-bold text-sm"
+              style="border-color: var(--border-color); background-color: var(--bg-soft);">
+              ℹ️ <span id="ui-ai-role-btn">點解設 AI 解說員與界線？</span>
+            </button>
+          </div>
+
+          <!-- 可摺疊：AI 解說員角色說明與安全界線 -->
+          <div id="ai-role-box" class="hidden soft-box p-4 text-sm space-y-1.5">
+            <p><strong>✅ 建議設立的原因：</strong>深夜或突發事故時，長者、家屬、外傭或旅客往往情緒慌亂且無人可問；AI 解說員能提供零壓力、多語言、不推銷的即時步驟拆解與防騙提醒，亦大幅減輕公益平台創辦人的長期人工答問負擔。</p>
+            <p><strong>🛡️ 嚴格安全界線（絕不越界）：</strong>AI 只作一般香港公開資訊解說與防騙引導，<strong>絕不提供正式法律或醫療診斷意見</strong>，絕不索取身份證號碼、銀行密碼或轉賬；在零成本免費公開託管模式下，會優先以內置已核實之 9 國語言本地知識庫作即時回覆，免除 API 外洩及費用風險。</p>
+          </div>
+
+          <!-- 快捷提問氣泡 -->
+          <div class="flex flex-wrap gap-2" id="ai-quick-prompts"></div>
+
+          <!-- 對話訊息區 -->
+          <div id="ai-chat-log" class="soft-box p-4 space-y-3 max-h-[420px] overflow-y-auto"></div>
+
+          <!-- 輸入框 + 語音輸入 + 送出 -->
+          <div class="flex flex-col sm:flex-row gap-2">
+            <div class="flex-1 flex gap-2">
+              <button type="button" onclick="startDictation('ai-user-input', this)" title="語音發問"
+                class="min-h-[54px] px-4 rounded-xl border-2 font-bold shrink-0"
+                style="border-color: var(--accent); background-color: var(--accent-soft); color: var(--text-main);">
+                🎤
+              </button>
+              <input id="ai-user-input" type="text" onkeydown="if(event.key==='Enter') sendAiMessage()"
+                placeholder="輸入問題，或按 🎤 直接講出你想問的事..."
+                class="w-full min-h-[54px] px-4 rounded-xl border-2 text-base"
+                style="background-color: var(--bg-main); border-color: var(--border-color); color: var(--text-main);" />
+            </div>
+            <button type="button" onclick="sendAiMessage()" id="ai-send-btn" class="btn-primary px-6 py-3 shrink-0">
+              <span id="ui-ai-send-lbl">發送提問 ➤</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           TAB 5: 2026 食環署公眾龕位每月編配日曆與 .ics 提醒
+           ===================================================== -->
+      <section id="panel-niche" class="hidden space-y-5">
+        <div class="card p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="font-extrabold text-xl sm:text-2xl">📅 2026 食環署公眾龕位每月編配日曆提醒</h2>
+              <p class="text-sm opacity-85 mt-1">
+                自 <strong>2026 年 8 月 1 日</strong> 起，食環署改行「每月編配公眾骨灰龕位」機制（每月 1 日上午 9 時至月底下午 5 時接受申請，次月 20 日抽籤），涵蓋<strong>和合石第六期、哥連臣角新廈、沙田石門及屯門曾咀</strong>，每月合共供應逾 1,600 個可續期龕位。
+              </p>
+            </div>
+            <button type="button" onclick="downloadNicheICS()" class="btn-primary px-4 py-2.5 flex items-center gap-2">
+              📲 下載手機日曆提醒 (.ics)
+            </button>
+          </div>
+
+          <!-- 動態倒數看板 (V1.2 新增本月截止倒數 + 下月開放日期) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="soft-box p-4 text-center">
+              <div class="text-sm font-bold opacity-80">本月批次截止倒數</div>
+              <div id="niche-current-deadline" class="text-2xl font-extrabold mt-1" style="color: var(--warn-text);">計算中...</div>
+              <div id="niche-current-end-date" class="text-xs opacity-80 mt-1">每月最後一日 17:00 截止</div>
+            </div>
+            <div class="soft-box p-4 text-center">
+              <div class="text-sm font-bold opacity-80">下一輪開放日期</div>
+              <div id="niche-next-window" class="text-2xl font-extrabold mt-1" style="color: var(--accent);">計算中...</div>
+              <div id="niche-countdown" class="text-xs opacity-80 mt-1">每月 1 日 09:00 開始</div>
+            </div>
+            <div class="soft-box p-4 text-center">
+              <div class="text-sm font-bold opacity-80">官方龕位收費參考</div>
+              <div class="text-xl font-extrabold mt-1">標準 $2,490 / 大 $3,090</div>
+              <div class="text-xs opacity-80 mt-1">首次安放期 20 年，其後每 10 年續期</div>
+            </div>
+            <div class="soft-box p-4 text-center">
+              <div class="text-sm font-bold opacity-80">食環署骨灰暫存</div>
+              <div class="text-2xl font-extrabold mt-1">HK$80 / 月</div>
+              <div class="text-xs opacity-80 mt-1">首 2 個月免費；其後填表 FEHB 251</div>
+            </div>
+          </div>
+
+          <!-- 每月申請核對步驟 (支援已完成 / 不適用) -->
+          <div class="space-y-2.5">
+            <h3 class="font-extrabold text-lg">🔎 申請公眾龕位防錯核對（可揀選「不適用」）</h3>
+            <div id="niche-checklist-container" class="space-y-2"></div>
+          </div>
+
+          <div class="amber-box p-3.5 text-sm">
+            <strong>🛡️ 防騙提醒：</strong>切勿向聲稱「有內部名額、保證抽中公眾龕位」的私營中介付款！所有食環署公眾龕位一律透過官方網上系統或葵芳新都會廣場第一座 35 樓編配辦事處（查詢：<strong>2841 9111</strong>）公開免費申請與抽籤（查證：<a href="https://www.fehd.gov.hk" target="_blank" rel="noopener" class="underline font-bold">fehd.gov.hk</a>）。
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           TAB 6: 平安三寶 2026 法例互動問答 (第 651 章)
+           ===================================================== -->
+      <section id="panel-quiz" class="hidden space-y-5">
+        <div class="card p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="font-extrabold text-xl sm:text-2xl">⚖️ 「平安三寶」2026 法例互動問答</h2>
+              <p class="text-sm opacity-85 mt-1">
+                緊貼 2026 年 7 月 31 日生效之《維持生命治療的預作決定條例》（第 651 章），10 題生活化粵語情景，拆解誤解及防騙陷阱。
+              </p>
+            </div>
+            <div class="soft-box px-4 py-2 font-extrabold text-base">
+              答對進度：<span id="quiz-score">0</span> / <span id="quiz-total">10</span>
+            </div>
+          </div>
+
+          <!-- 三寶極速對照表 -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse">
+              <thead>
+                <tr style="background-color: var(--bg-soft);">
+                  <th class="p-2.5 border text-left" style="border-color: var(--border-color);">文件名稱</th>
+                  <th class="p-2.5 border text-left" style="border-color: var(--border-color);">生效時間</th>
+                  <th class="p-2.5 border text-left" style="border-color: var(--border-color);">核心用途</th>
+                  <th class="p-2.5 border text-left" style="border-color: var(--border-color);">2026 關鍵法例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2.5 border font-bold" style="border-color: var(--border-color);">1. 平安紙（遺囑）</td>
+                  <td class="p-2.5 border" style="border-color: var(--border-color);">離世後生效</td>
+                  <td class="p-2.5 border" style="border-color: var(--border-color);">分配遺產（含單身捐慈善機構）、委任執行人</td>
+                  <td class="p-2.5 border" style="border-color: var(--border-color);">兩名非受益人見證；無遺囑無人認領 5 年後歸政府</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border font-bold" style="border-color: var(--border-color);">2. 持久授權書 (EPA)</td>
+                  <td class="p-2.5 border" style="border-color: var(--border-color);">生前失去精神能力後（離世即失效）</td>
+                  <td class="p-2.5 border" style="border-color: var(--border-color);">授權親友代管香港財務及銀行事務</td>
+                  <td class="p-2.5 border" style="border-color: var(--border-color);">須由註冊醫生及香港律師見證（28 日內完成），並向高等法院註冊</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border font-bold" style="border-color: var(--border-color);">3. 預設醫療指示 (AMD)</td>
+                  <td class="p-2.5 border" style="border-color: var(--border-color);">生前陷指定末期／不可逆轉昏迷</td>
+                  <td class="p-2.5 border" style="border-color: var(--border-color);">預先指明拒絕特定維持生命治療（如心肺復甦）</td>
+                  <td class="p-2.5 border font-semibold" style="border-color: var(--border-color);">2026 年 7 月 31 日法定生效（第 651 章），採「慎入易出」，可上載醫健通</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 互動題目容器 -->
+        <div id="quiz-container" class="space-y-4"></div>
+      </section>
+
+      <!-- =====================================================
+           TAB 7: 防騙查冊、宗教團體、合法慈善代理 & 租車防坑 (全部號碼已覆核)
+           ===================================================== -->
+      <section id="panel-directory" class="hidden space-y-5">
+        <!-- 搜尋與篩選 -->
+        <div class="card p-4 sm:p-5 space-y-3">
+          <h2 class="font-extrabold text-xl sm:text-2xl">🛡️ 防騙 10 秒查冊、宗教團體及合法慈善代理名錄（2026 核實版）</h2>
+          <p class="text-sm opacity-85">
+            優先標註 WhatsApp／電郵／傳真等<strong>聽障友善</strong>非電話聯絡渠道。涉及捐款或代理身後事，務必先到稅務局《稅務條例》第 88 條免稅慈善名單查冊！
+          </p>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input id="dir-search" type="text" oninput="renderDirectory()" placeholder="搜尋關鍵字：例如 食環署、佛教、天主教、榕光社、東華、聽障、稅務局..."
+              class="flex-1 min-h-[50px] px-4 rounded-xl border-2"
+              style="background-color: var(--bg-main); border-color: var(--border-color); color: var(--text-main);" />
+            <select id="dir-cat" onchange="renderDirectory()" class="min-h-[50px] px-3 rounded-xl border-2 font-bold"
+              style="background-color: var(--bg-soft); border-color: var(--border-color); color: var(--text-main);">
+              <option value="all">全部類別</option>
+              <option value="gov">政府官方查冊</option>
+              <option value="charity">合法慈善／獨居代理</option>
+              <option value="religion">五大宗教官方</option>
+              <option value="deaf">聽障／視障共融支援</option>
+            </select>
+          </div>
+          <div id="directory-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2"></div>
+        </div>
+
+        <!-- 出殯交通工具租賃 8 點防坑互動核對 (支援已完成 / 不適用) -->
+        <div class="card p-4 sm:p-5 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="font-extrabold text-xl">🚌 出殯交通工具租賃（旅遊巴／靈車）8 點防坑核對</h3>
+              <p class="text-sm opacity-85">向車行或殯儀商問價前逐項核實，如該項不適用（例如不辦出殯儀式或改用綠色殯葬）可直接點選「不適用」。</p>
+            </div>
+            <button type="button" onclick="copyVehicleChecklist()" class="min-h-[48px] px-4 rounded-xl border-2 font-bold text-sm"
+              style="border-color: var(--accent); background-color: var(--accent-soft); color: var(--text-main);">
+              📋 複製問價清單
+            </button>
+          </div>
+          <div id="vehicle-checklist-container" class="space-y-2.5"></div>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           TAB 8: 清明重陽掃墓交通天氣 & 零私利行善原則
+           ===================================================== -->
+      <section id="panel-festival" class="hidden space-y-5">
+        <div class="card p-4 sm:p-5 space-y-4">
+          <h2 class="font-extrabold text-xl sm:text-2xl">⛰️ 清明・重陽掃墓實時交通與天氣直達</h2>
+          <p class="text-sm opacity-85">
+            掃墓高峰期各主要墳場（將軍澳華人永遠墳場、和合石、曾咀、鑽石山、哥連臣角、柴灣）常實施特別封路及接駁巴士安排，出發前請一鍵查閱官方即時資訊，確保長者安全：
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <a href="https://www.hko.gov.hk/tc/index.html" target="_blank" rel="noopener" class="soft-box p-4 block hover:opacity-90">
+              <div class="text-2xl">🌦️</div>
+              <div class="font-extrabold text-lg mt-1">香港天文台即時天氣</div>
+              <p class="text-sm opacity-80 mt-1">查看山泥傾瀉、雷暴、酷熱天氣及火災危險警告，免長者中暑或滑倒。</p>
+              <div class="text-sm font-bold mt-2 underline" style="color: var(--accent);">前往 hko.gov.hk ↗</div>
+            </a>
+            <a href="https://www.td.gov.hk/tc/traffic_notices/index.html" target="_blank" rel="noopener" class="soft-box p-4 block hover:opacity-90">
+              <div class="text-2xl">🚦</div>
+              <div class="font-extrabold text-lg mt-1">運輸署掃墓特別交通</div>
+              <p class="text-sm opacity-80 mt-1">查閱將軍澳、柴灣、和合石、曾咀封路時段及復康巴士許可證安排。</p>
+              <div class="text-sm font-bold mt-2 underline" style="color: var(--accent);">前往 td.gov.hk ↗</div>
+            </a>
+            <a href="https://www.greenburial.gov.hk/tc/home/index.html" target="_blank" rel="noopener" class="soft-box p-4 block hover:opacity-90">
+              <div class="text-2xl">🌿</div>
+              <div class="font-extrabold text-lg mt-1">綠色殯葬與「無盡思念」</div>
+              <p class="text-sm opacity-80 mt-1">免費登記《綠色殯葬中央登記名冊》(FEHB 278) 或網上追思，方便行動不便或海外家人拜祭。</p>
+              <div class="text-sm font-bold mt-2 underline" style="color: var(--accent);">前往 greenburial.gov.hk ↗</div>
+            </a>
+          </div>
+          <div class="soft-box p-4 text-sm space-y-1.5">
+            <h3 class="font-extrabold text-base">👵 帶長者／輪椅人士掃墓 4 點安全提示：</h3>
+            <p>• <strong>善用無障礙復康交通：</strong>提前查詢香港復康會「易達巴士」或各墳場接駁無障礙巴士班次。</p>
+            <p>• <strong>避開封路斜路步行：</strong>將軍澳華永墳場等斜度高，建議改於清明／重陽前後一週錯峰拜祭，或使用「無盡思念」網上追思。</p>
+            <p>• <strong>化寶安全與帶備藥物：</strong>切勿在草叢點火，帶備足夠食水、雨具、長者常用急救藥及防滑鞋。</p>
+          </div>
+        </div>
+
+        <!-- 零私利永續積福原則 -->
+        <div class="card p-4 sm:p-5 space-y-3">
+          <h2 class="font-extrabold text-xl sm:text-2xl">💛 「安心後事通」永續積福與零金錢利益聲明</h2>
+          <div class="space-y-2 text-sm sm:text-base">
+            <p>1. <strong>絕不收取任何金錢利益：</strong>本平台及發起人嚴守不收費、不抽佣、不接受殯儀商業廣告、不代收捐款原則。</p>
+            <p>2. <strong>鼓勵自願直接行善：</strong>若本工具能幫你或家人省卻奔波、減少遺憾或避開騙局，歡迎你隨心自願，<strong>直接向身邊有需要人士或香港合法註冊慈善機構（稅務局第 88 條免稅團體）捐贈物資或善款</strong>，將福德延續。</p>
+            <p>3. <strong>計劃變更或取消提醒：</strong>本構思與建議計劃屬民間公益嘗試，日後或會因設計調整、法例變更、技術條件或不可抗力原因而修改、暫停或取消，敬請所有使用者自行備份及列印所需清單。</p>
+            <p class="pt-1">
+              <a href="https://www.ird.gov.hk/chi/tax/ach_index.htm" target="_blank" rel="noopener" class="font-bold underline" style="color: var(--accent);">
+                🔎 前往稅務局第 88 條認可免稅慈善團體官方名單查核 ↗
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="border-t-2 py-4 px-3 text-center text-xs sm:text-sm opacity-80" style="border-color: var(--border-color); background-color: var(--bg-card);">
+      <p>安心後事通 (HK Afterlife Guide) V1.2 ｜ 積福德・減遺憾・防受騙・零金錢利益 ｜ 資料核實基準：2026 年 11 月</p>
+      <p class="mt-1">所有填寫資料僅儲存在你的瀏覽器本機，不會上傳至任何伺服器。本網站不構成法律或醫療意見。</p>
+    </footer>
+  </div>
+
+  <!-- 浮動快捷 AI 解說員按鈕 -->
+  <button type="button" id="floating-ai-btn" onclick="switchTab('ai')"
+    class="fixed bottom-4 right-4 z-40 btn-primary px-4 py-3 shadow-xl flex items-center gap-2 rounded-full border-2 border-white">
+    <span class="text-xl">🤖</span>
+    <span id="ui-fab-ai" class="hidden sm:inline">問 AI 解說員</span>
+  </button>
+
+  <!-- =========================================================
+       彈窗 1：聽障無聲大字溝通卡 + 雙語緊急求助卡 Modal
+       ========================================================= -->
+  <div id="deaf-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-3">
+    <div class="card w-full max-w-2xl max-h-[92vh] overflow-y-auto p-5 space-y-4">
+      <div class="flex items-center justify-between gap-2">
+        <h2 id="ui-deaf-modal-title" class="font-extrabold text-xl">👂 聽障大字溝通卡 / 雙語求助卡</h2>
+        <button type="button" onclick="closeModal('deaf-modal')" class="min-h-[44px] px-3 rounded-xl border-2 font-bold">✕ 關閉</button>
+      </div>
+      <p id="ui-deaf-modal-desc" class="text-sm opacity-85">點選下方常用句，或自行打字，即可放大成全螢幕特大字展示給醫護、救護員、警察、殯儀職員或家人看：</p>
+
+      <!-- 特大字顯示板 -->
+      <div id="deaf-giant-display" class="p-6 rounded-2xl border-4 text-center font-black text-2xl sm:text-4xl leading-snug"
+        style="background-color: #FEF08A; color: #000000; border-color: #000000;">
+        我有聽覺困難，請寫字或用慢速文字同我溝通，多謝體諒。
+      </div>
+
+      <!-- 預設快速卡片 -->
+      <div id="deaf-preset-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+
+      <!-- 自訂大字輸入 -->
+      <div class="flex gap-2">
+        <input id="deaf-custom-input" type="text" placeholder="輸入任何句子即時變成特大字..."
+          oninput="document.getElementById('deaf-giant-display').innerText = this.value || I18N[currentLang].deafPresets[0]"
+          class="flex-1 min-h-[50px] px-3 rounded-xl border-2"
+          style="background-color: var(--bg-main); border-color: var(--border-color); color: var(--text-main);" />
+        <button type="button" id="btn-read-deaf" class="btn-primary px-4">🔊 <span class="ui-read-aloud">朗讀</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       彈窗 2：即時分享 QR Code Modal
+       ========================================================= -->
+  <div id="qr-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-3">
+    <div class="card w-full max-w-md p-5 space-y-4 text-center">
+      <div class="flex items-center justify-between">
+        <h2 class="font-extrabold text-xl">📱 即時掃碼分享給親友</h2>
+        <button type="button" onclick="closeModal('qr-modal')" class="min-h-[44px] px-3 rounded-xl border-2 font-bold">✕</button>
+      </div>
+      <p class="text-sm opacity-85">讓長者、家人、外傭或有需要的朋友直接用手機相機掃描，即時打開「安心後事通」免費工具：</p>
+      <div class="flex justify-center p-4 bg-white rounded-2xl border-2 border-slate-300">
+        <div id="qrcode-box"></div>
+      </div>
+      <div class="text-xs break-all opacity-75 px-2" id="qr-url-preview"></div>
+      <button type="button" onclick="copyShareUrl()" class="btn-primary w-full py-3">📋 複製連結分享給 WhatsApp 親友</button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       彈窗 3：自訂確認清除視窗 (絕不用 alert/confirm)
+       ========================================================= -->
+  <div id="confirm-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-3">
+    <div class="card w-full max-w-md p-5 space-y-4">
+      <h2 class="font-extrabold text-xl">⚠️ 確定要清除已填寫紀錄？</h2>
+      <p id="confirm-modal-msg" class="text-base">清除後本機暫存的剔選及文字將會重設，建議先按 A4 列印留底。</p>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="closeModal('confirm-modal')" class="min-h-[48px] px-5 rounded-xl border-2 font-bold">取消</button>
+        <button type="button" onclick="executeConfirmedClear()" class="min-h-[48px] px-5 rounded-xl font-bold bg-red-600 text-white">確定清除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 輕量提示吐司 (Toast Container) -->
+  <div id="toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- =========================================================
+       專用 A4 列印視區 (#print-area)
+       ========================================================= -->
+  <div id="print-area"></div>
+
+  <!-- =========================================================
+       主程式邏輯 (JavaScript — 無內嵌引號風險、完整 9 語、零外洩部署友善)
+       ========================================================= -->
+  <script>
+    /* ---------------------------------------------------------
+       1. 全域狀態與本機儲存 (State & LocalStorage)
+       --------------------------------------------------------- */
+    const STORAGE_KEY_ELDER = 'hk_afterlife_elder_v1_2';
+    const STORAGE_KEY_FAMILY = 'hk_afterlife_family_v1_2';
+    const STORAGE_KEY_VEHICLE = 'hk_afterlife_vehicle_v1_2';
+    const STORAGE_KEY_NICHE = 'hk_afterlife_niche_v1_2';
+
+    let currentLang = 'zh-HK';
+    let speechRate = 0.75; // 預設 0.75x 慢速，方便長者聽清
+    let pendingClearTarget = null;
+    let quizAnswered = {};
+    let aiChatHistory = [];
+    // 用於安全存放動態朗讀文字（徹底根除英文單引號造成 onclick 失效問題）
+    let speakRegistry = new Map();
+    let speakSeq = 0;
+
+    function registerSpeakText(text) {
+      const id = 'spk_' + (++speakSeq);
+      speakRegistry.set(id, String(text || ''));
+      return id;
+    }
+
+    // 載入本機狀態（向下相容 V1.1 已填寫資料）
+    let elderData = safeLoad(STORAGE_KEY_ELDER, safeLoad('hk_afterlife_elder_v1_1', { selections: {}, texts: {} }));
+    let familyData = safeLoad(STORAGE_KEY_FAMILY, safeLoad('hk_afterlife_family_v1_1', { statuses: {}, notes: '' }));
+    let vehicleData = safeLoad(STORAGE_KEY_VEHICLE, safeLoad('hk_afterlife_vehicle_v1_1', {}));
+    let nicheData = safeLoad(STORAGE_KEY_NICHE, safeLoad('hk_afterlife_niche_v1_1', {}));
+
+    function safeLoad(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+    function safeSave(key, obj) {
+      try {
+        localStorage.setItem(key, JSON.stringify(obj));
+      } catch (e) {
+        // 忽略無痕模式儲存限制
+      }
+    }
+
+    /* ---------------------------------------------------------
+       2. 完整 9 國語言翻譯字典 (含外傭・旅客詳細步驟與按鈕)
+       --------------------------------------------------------- */
+    const I18N = {
+      'zh-HK': {
+        appTitle: '安心後事通',
+        appSubtitle: 'HK Afterlife Guide V1.2｜零盈利公益平台',
+        contrast: '高對比',
+        deafBtn: '聽障溝通卡',
+        qrBtn: '分享 QR',
+        readAloud: '朗讀',
+        rateSlow: '0.75x 慢讀',
+        rateNormal: '1.0x 正常',
+        fabAi: '問 AI 解說員',
+        aiSend: '發送提問 ➤',
+        aiPlaceholder: '輸入問題，或按 🎤 直接講出你想問的事...',
+        bannerTitle: '🌱 零私利積福承諾與重要提醒：',
+        bannerText: '本平台絕不收取任何金錢利益或佣金，鼓勵自願直接向有需要人士或香港合法註冊慈善機構捐贈。本構思及建議計劃或會因設計調整或不可抗力原因而修改、暫停或取消，敬請留意。',
+        nav: {
+          elder: '長者交帶手冊', family: '家屬辦理清單', helper: '外傭・旅客緊急',
+          ai: 'AI 安心解說員', niche: '龕位每月日曆', quiz: '平安三寶 2026',
+          directory: '防騙・宗教・租車', festival: '掃墓交通與行善'
+        },
+        helperTitle: '🌍 留港外傭（工人姐姐）及旅客突發意外／身故緊急指南',
+        helperSubtitle: '專為在港工作之外籍家庭傭工、僱主及訪港旅客而設。萬一遇突發嚴重意外，可即時查閱法定保障、領事館及防騙步驟。',
+        btnShowCard: '顯示雙語特大求助卡',
+        consulateTitle: '🏛️ 主要駐港總領事館、兩岸及外傭支援機構（防騙核實參考）',
+        helperAntiScam: '⚠️ 防騙警示：領事館與香港勞工處絕不會透過陌生 WhatsApp 要求轉賬至個人戶口。按標準僱傭合約，外傭在合約期內不幸身故，僱主有法定責任承擔遺體及個人物品運返原居地之費用。',
+        hotlines: [
+          { icon: '🚨', name: '報警／救護／消防 (999)', num: '999', note: '24 小時免費｜支援廣東話、普通話、英語及多語傳譯' },
+          { icon: '💬', name: '聽障緊急短訊求助 (992)', num: '992', note: '須預先向警方登記之聽障／語障人士使用' },
+          { icon: '👷', name: '勞工處外傭 24 小時專線', num: '2157 9537', note: '支援粵語、普通話、英語、印尼語、菲律賓語、泰語' },
+          { icon: '🛂', name: '入境處協助在外港人熱線', num: '1868', note: '香港一般入境查詢：2824 6111' }
+        ],
+        scenarios: [
+          {
+            title: '🏠 外籍家庭傭工 (FDH / 工人姐姐) 遇意外或不幸身故',
+            points: [
+              '1. <strong>即時醫療與報警：</strong>遇嚴重意外立即致電 <strong>999</strong> 送往公立醫院急症室；按標準僱傭合約，僱主須為外傭提供免費醫療。',
+              '2. <strong>通知僱主與勞工處：</strong>如屬工傷，僱主須按《僱員補償條例》於法定期限內呈報（死亡個案須於 7 天內呈報勞工處）。',
+              '3. <strong>遺體運返法定責任：</strong>若外傭在合約期內不幸身故，標準僱傭合約明確規定<strong>僱主須承擔將遺體及個人物品運返原居地的費用</strong>（僱主應即時查閱家傭綜合保險）。',
+              '4. <strong>聯絡所屬駐港總領事館：</strong>由領事館協助通知原居地家屬及辦理運返文件，親友<strong>切勿向陌生中介轉賬</strong>。'
+            ]
+          },
+          {
+            title: '✈️ 訪港旅客 (海內外及兩岸旅客) 遇突發事故',
+            points: [
+              '1. <strong>即時聯絡旅遊保險 24 小時熱線：</strong>支付任何高額商業醫療或遺體運返費用前，先致電保單上的全球緊急支援中心開立個案編號。',
+              '2. <strong>通知駐港總領事館／急難辦事處：</strong>協助聯絡原居地家人、核實身份、簽發證件或運返文件。',
+              '3. <strong>公立醫院與死因庭程序：</strong>非本地居民於公立醫院收費與港人不同；如屬突發意外離世，警方將轉介死因裁判官調查，務必保存報案編號。',
+              '4. <strong>家人無法即時飛來香港：</strong>可透過領事館或保險協調，或先在港火化並以每月 HK$80 暫存骨灰於食環署（表格 FEHB 251），待家人日後安全來港領取。'
+            ]
+          }
+        ],
+        aiTitle: '🤖 AI 安心解說員（管理員角色）',
+        aiDesc: '24 小時以平和易明語言，解答香港 2026 善終法例、防騙查冊、海外失聯應急及外傭／旅客突發處理疑問。只作資訊解說，絕不推銷。',
+        aiWelcome: '你好！我係「安心後事通」嘅 AI 安心解說員。無論你係幫自己預早規劃、幫屋企人跟進後事、定係外傭朋友／旅客喺香港遇上突發情況需要查閱官方求助程序，都可以問我。請放心，呢度絕無推銷，亦唔會叫你提供密碼或轉賬。你想了解邊方面先？',
+        aiPrompts: [
+          '2026年「平安三寶」同預設醫療指示有咩新法例？',
+          '屋企人喺海外返唔切香港，骨灰暫存同代理點安排？',
+          '外傭（工人姐姐）喺香港遇突發意外或身故，僱主同領事館點處理？',
+          '點樣快速查核殯儀商或慈善機構係咪合法防受騙？'
+        ],
+        deafPresets: [
+          '我有聽覺困難，請寫字或用慢速文字同我溝通，多謝體諒。',
+          '我需要聯絡家人／翻譯員，請幫我致電以下緊急聯絡人。',
+          '請問呢個係咪政府官方收費？請列出書面報價單，唔好口頭報價。',
+          '我係訪港旅客／外籍家庭傭工，請幫我聯絡駐港總領事館及報警 999。'
+        ],
+        speechLang: 'zh-HK'
+      },
+      'zh-CN': {
+        appTitle: '安心后事通',
+        appSubtitle: 'HK Afterlife Guide V1.2｜零盈利公益平台（普通话）',
+        contrast: '高对比',
+        deafBtn: '听障沟通卡',
+        qrBtn: '分享 QR',
+        readAloud: '朗读',
+        rateSlow: '0.75x 慢读',
+        rateNormal: '1.0x 正常',
+        fabAi: '问 AI 解说员',
+        aiSend: '发送提问 ➤',
+        aiPlaceholder: '输入问题，或按 🎤 直接说出您想问的事...',
+        bannerTitle: '🌱 零私利积福承诺与重要提醒：',
+        bannerText: '本平台绝不收取任何金钱利益或佣金，鼓励自愿直接向有需要人士或香港合法注册慈善机构捐赠。本构思及建议计划或会因设计调整或不可抗力原因而修改、暂停或取消，敬请留意。',
+        nav: {
+          elder: '长者交待手册', family: '家属办理清单', helper: '外佣・旅客紧急',
+          ai: 'AI 安心解说员', niche: '龛位每月日历', quiz: '平安三宝 2026',
+          directory: '防骗・宗教・租车', festival: '扫墓交通与行善'
+        },
+        helperTitle: '🌍 留港外佣及访港旅客突发意外／身故紧急指南',
+        helperSubtitle: '专为在港工作的内地人士、访港旅客、外籍家庭佣工及雇主而设。如在港遇突发严重意外，可即时查阅 999 求助、官方热线及防骗步骤。',
+        btnShowCard: '显示特大紧急求助卡',
+        consulateTitle: '🏛️ 主要驻港领事馆、内地及台湾访港紧急支持机构',
+        helperAntiScam: '⚠️ 防骗警示：任何香港政府部门、警方或领事馆绝不会通过陌生微信或 WhatsApp 要求转账至个人账户。访港旅客遇突发意外请直接拨打 999、联络旅游保险 24 小时热线及官方渠道核实。',
+        hotlines: [
+          { icon: '🚨', name: '香港报警／急救／消防', num: '999', note: '24 小时免费｜支持普通话、粤语、英语接线' },
+          { icon: '💬', name: '听障紧急短信求助', num: '992', note: '供已预先登记的听障／语障人士使用' },
+          { icon: '🧳', name: '旅游业监管局 / 旅发局', num: '3698 5900', note: '旅发局热线：2508 1234；外佣专线：2157 9537' },
+          { icon: '🛡️', name: '香港警方防骗易 24 小时', num: '18222', note: '可疑来电或收款账户即时核查，防被骗' }
+        ],
+        scenarios: [
+          {
+            title: '✈️ 内地及海外访港旅客突发意外／身故处理步骤',
+            points: [
+              '1. <strong>立即拨打 999 与联络旅游保险：</strong>遇到突发意外马上拨打 <strong>999</strong>（支援普通话）；在支付任何高额商业医疗或运返费前，先联系旅游保险 24 小时救援热线。',
+              '2. <strong>保存警方报案编号与医院文件：</strong>非香港居民于公立医院急症室收费与本地居民不同；如涉及非自然死亡，警方将转介死因裁判官调查。',
+              '3. <strong>证件与家属赴港应急：</strong>遗失证件须先报案并联系香港中旅社或官方部门协助；如家属一时无法赶赴香港，可先授权合规持牌机构办理简单火化。',
+              '4. <strong>官方骨灰暂存过渡：</strong>火化后可向香港食环署申请官方骨灰暂存（每月港币 80 元，表格 FEHB 251），待家属日后方便来港再领取或办理骨灰带回内地手续。'
+            ]
+          },
+          {
+            title: '🏠 外籍家庭佣工 (外佣) 在港意外或身故法定保障',
+            points: [
+              '1. <strong>免费医疗与工伤呈报：</strong>标准雇佣合约规定雇主须提供免费医疗；若属工伤身故，雇主须于 7 天内向香港劳工处呈报。',
+              '2. <strong>遗体运返责任：</strong>若外佣于合约期内不幸身故，雇主有法定责任承担遗体及个人物品运返原居地之费用。',
+              '3. <strong>联络官方热线与领事馆：</strong>可随时致电香港劳工处外佣 24 小时专线 <strong>2157 9537</strong> 及所属驻港总领事馆核实协助。'
+            ]
+          }
+        ],
+        aiTitle: '🤖 AI 安心解说员（普通话管理员角色）',
+        aiDesc: '24 小时以平和易懂的普通话，解答香港 2026 善终法例、防骗查册、内地及海外家属应急处理及骨灰暂存疑问。只作资讯解说，绝不推销。',
+        aiWelcome: '您好！我是「安心后事通」的 AI 安心解说员。无论您是想了解香港 2026 年平安三宝与公办龛位安排、内地或海外亲友赴港紧急处理流程，还是需要核实防骗资讯，都可以直接用普通话向我提问。这里完全免费，绝无推销。请问有什么可以帮您？',
+        aiPrompts: [
+          '内地旅客在香港突发意外或不幸离世，家属应按什么步骤处理？',
+          '香港 2026 年「平安三宝」和预设医疗指示有哪些新规定？',
+          '家属暂时无法赶赴香港，香港食环署骨灰暂存怎么申请？',
+          '如何快速查询香港持牌殡仪商或合法慈善机构以防受骗？'
+        ],
+        deafPresets: [
+          '我有听力困难，请用文字或放慢语速与我沟通，非常感谢！',
+          '紧急求助：我是访港旅客，请帮我拨打 999 报警／急救，并协助联络我的家人。',
+          '请问这是香港政府官方收费吗？请提供列明明细的书面报价单，不要口头报价。',
+          '请帮我联络我的旅游保险 24 小时急救热线或香港旅游业监管局 (3698 5900)。'
+        ],
+        speechLang: 'zh-CN'
+      },
+      'zh-TW': {
+        appTitle: '安心後事通',
+        appSubtitle: 'HK Afterlife Guide V1.2｜零營利公益平台（台灣語／國語）',
+        contrast: '高對比',
+        deafBtn: '聽障溝通卡',
+        qrBtn: '分享 QR',
+        readAloud: '朗讀',
+        rateSlow: '0.75x 慢讀',
+        rateNormal: '1.0x 正常',
+        fabAi: '問 AI 解說員',
+        aiSend: '送出提問 ➤',
+        aiPlaceholder: '輸入問題，或按 🎤 直接用國語講出您想問的事...',
+        bannerTitle: '🌱 零私利積福承諾與重要提醒：',
+        bannerText: '本平台絕不收取任何金錢利益或佣金，鼓勵自願直接向有需要人士或香港合法註冊慈善機構捐款／捐物。本構思及建議計畫或會因設計調整或不可抗力因素而修改、暫停或取消，敬請留意。',
+        nav: {
+          elder: '長輩交代手冊', family: '家屬辦理清單', helper: '外傭・旅客緊急',
+          ai: 'AI 安心解說員', niche: '塔位每月日曆', quiz: '平安三寶 2026',
+          directory: '防詐・宗教・租車', festival: '掃墓交通與行善'
+        },
+        helperTitle: '🌍 台灣旅客、海外訪客及留港外傭突發意外緊急指南',
+        helperSubtitle: '專為赴港旅遊、工作之台灣鄉親、海外旅客及外籍看護幫傭設計。萬一在香港發生突發意外，可即時查閱 999 報案、駐港急難救助專線及防詐騙核實步驟。',
+        btnShowCard: '顯示特大緊急求助卡',
+        consulateTitle: '🏛️ 台北經濟文化辦事處（香港）、各國領事館及支援機構',
+        helperAntiScam: '⚠️ 防詐騙警示：台北經濟文化辦事處（香港）及香港政府機關絕不會透過陌生 LINE 或 WhatsApp 要求匯款至個人帳戶！台灣民眾在港遇急難請直撥 24 小時急難救助專線 (852) 6143 9012。',
+        hotlines: [
+          { icon: '🚨', name: '香港報案／救護／消防', num: '999', note: '24 小時免費｜支援國語（普通話）、粵語、英語' },
+          { icon: '🇹🇼', name: '台北辦事處 24h 急難專線', num: '6143 9012', note: '備用專線：9314 0130（一般辦公查詢：2887 5011）' },
+          { icon: '👷', name: '香港勞工處外傭 24h 專線', num: '2157 9537', note: '提供多語諮詢與勞工權益協助' },
+          { icon: '🛡️', name: '香港警方防詐騙專線', num: '18222', note: '懷疑遇上詐騙中介，隨時撥打核實' }
+        ],
+        scenarios: [
+          {
+            title: '✈️ 台灣鄉親與訪港旅客突發意外／身故處理步驟',
+            points: [
+              '1. <strong>即撥 999 與台北辦事處急難專線：</strong>第一時間撥打 <strong>999</strong> 送醫，並致電台北經濟文化辦事處（香港）24 小時急難救助電話 <strong>(852) 6143 9012</strong> 或 <strong>9314 0130</strong> 尋求聯繫與協助。',
+              '2. <strong>啟動旅平險海外急難救助：</strong>在簽署高價商業運返合約前，務必先聯絡台灣旅平險保單上的 24 小時海外急難支援中心。',
+              '3. <strong>配合醫院與香港死因庭程序：</strong>保留警方報案編號與醫院紀錄；非香港居民於香港公立醫院急症室為非符合資格人士收費。',
+              '4. <strong>若家人一時無法飛港：</strong>可先於香港辦理簡單火化並向食環署申請骨灰暫存（每月 HK$80，表格 FEHB 251），日後再由家屬親自帶回台灣安奉，切勿受騙急買高價塔位。'
+            ]
+          },
+          {
+            title: '🏠 外籍家庭幫傭 (外傭) 在港意外或身故權益',
+            points: [
+              '1. <strong>免費醫療與職災通報：</strong>依香港標準僱傭合約，僱主須負擔免費醫療；若因工傷身故須於 7 日內通報香港勞工處。',
+              '2. <strong>遺體運返法定責任：</strong>外傭於合約期內不幸身故，香港法律規定僱主須負擔將遺體及個人物品運返原居地之費用。',
+              '3. <strong>洽詢領事館與官方熱線：</strong>直接聯絡所屬駐港總領事館與勞工處專線 <strong>2157 9537</strong>，勿輕信網路私人代辦。'
+            ]
+          }
+        ],
+        aiTitle: '🤖 AI 安心解說員（台灣國語／台語親切解說）',
+        aiDesc: '24 小時以平和易懂的台灣用語（亦可用台語口吻提問），為您解說香港 2026 善終法規、台灣旅客在港急難協助、骨灰暫存與防詐騙核對。僅供資訊參考，絕不推銷。',
+        aiWelcome: '您好，平安！我是「安心後事通」的 AI 安心解說員。無論您想了解香港 2026 善終與預立醫療決定法規、台灣鄉親在香港遇突發狀況要怎麼聯絡急難救助、或想核對防詐騙資訊，都可以直接問我。完全免費，絕無推銷！',
+        aiPrompts: [
+          '台灣旅客在香港發生突發意外或不幸離世，要怎麼聯絡駐港辦事處與處理？',
+          '香港 2026 年「平安三寶」和預立醫療指示（預設醫療指示）有什麼重點？',
+          '如果家人一時趕不到香港，骨灰可以先在香港食環署暫存嗎？',
+          '怎麼查香港合法的葬儀社（持牌殮葬商）或合法慈善團體，避免被騙？'
+        ],
+        deafPresets: [
+          '我有聽覺困難，請用寫字或文字訊息與我溝通，謝謝您的體諒！',
+          '緊急求助：我是台灣旅客，請幫我撥打 999，並協助聯絡台北經濟文化辦事處急難專線 6143 9012。',
+          '請問這是香港政府官方費用嗎？請提供正式書面分項報價單，不要口頭報價。',
+          '請協助聯絡我的旅平險 24 小時海外急難救助專線或台灣家人。'
+        ],
+        speechLang: 'zh-TW'
+      },
+      'en': {
+        appTitle: 'HK Afterlife Guide',
+        appSubtitle: 'V1.2 | Zero-Profit Public Welfare Platform',
+        contrast: 'Contrast',
+        deafBtn: 'Deaf Card',
+        qrBtn: 'Share QR',
+        readAloud: 'Listen',
+        rateSlow: '0.75x Slow',
+        rateNormal: '1.0x Normal',
+        fabAi: 'Ask AI Guide',
+        aiSend: 'Send ➤',
+        aiPlaceholder: 'Type your question or tap 🎤 to speak...',
+        bannerTitle: '🌱 Zero-Profit Pledge & Notice: ',
+        bannerText: 'This platform collects NO money or commissions. Voluntary direct donations to people in need or legal HK charities are encouraged. This initiative may be modified or cancelled due to design changes or force majeure.',
+        nav: {
+          elder: 'Elder Booklet', family: 'Family Checklist', helper: 'Helper & Tourist SOS',
+          ai: 'AI Guide Agent', niche: 'Monthly Niche Cal', quiz: '2026 Law Quiz',
+          directory: 'Anti-Scam & Coach', festival: 'Sweeping & Charity'
+        },
+        helperTitle: '🌍 Emergency Guide for Domestic Helpers & Tourists in Hong Kong',
+        helperSubtitle: 'Essential official steps, statutory repatriation rights, consulates, and anti-scam tips in case of sudden accident or passing in Hong Kong.',
+        btnShowCard: 'Show Bilingual SOS Card',
+        consulateTitle: '🏛️ Consulates General & Migrant Support NGOs in Hong Kong',
+        helperAntiScam: '⚠️ Anti-Scam Warning: Consulates and the HK Labour Dept NEVER ask for personal bank transfers via WhatsApp. Under the Standard Employment Contract, if a helper passes away during employment, the employer is legally responsible for the cost of repatriating the remains and personal belongings.',
+        hotlines: [
+          { icon: '🚨', name: 'Police / Ambulance / Fire', num: '999', note: '24/7 Free | English & multi-language interpretation available' },
+          { icon: '💬', name: 'Deaf SMS Emergency', num: '992', note: 'For pre-registered hearing/speech-impaired users in HK' },
+          { icon: '👷', name: 'Labour Dept FDH 24h Hotline', num: '2157 9537', note: 'English, Bahasa Indonesia, Tagalog, Thai, Cantonese, Putonghua' },
+          { icon: '🛡️', name: 'HK Police Anti-Scam Helpline', num: '18222', note: '24/7 verification against suspicious agents or transfers' }
+        ],
+        scenarios: [
+          {
+            title: '🏠 Foreign Domestic Helpers (FDH): Accident or Passing in HK',
+            points: [
+              '1. <strong>Call 999 Immediately:</strong> For serious injury or collapse, dial <strong>999</strong> for public hospital A&E. Under the Standard Employment Contract, employers must provide free medical treatment.',
+              '2. <strong>Work Injury Reporting:</strong> Employers must report fatal work accidents to the HK Labour Dept within 7 days under the Employees\' Compensation Ordinance.',
+              '3. <strong>Statutory Repatriation Duty:</strong> If an FDH passes away during the contract period, the <strong>employer is legally responsible for the cost of transporting the remains and personal belongings back to the home country</strong> (check helper insurance policy immediately).',
+              '4. <strong>Contact the Consulate General:</strong> Work directly with the home country Consulate and Labour Dept (2157 9537). Never transfer money to unknown WhatsApp middlemen.'
+            ]
+          },
+          {
+            title: '✈️ Overseas Tourists & Visitors: Sudden Emergency in HK',
+            points: [
+              '1. <strong>Call Travel Insurance 24h Desk First:</strong> Before paying large commercial medical or repatriation deposits, open a case file with your insurer\'s 24/7 assistance hotline.',
+              '2. <strong>Notify Your Consulate General:</strong> Consulates assist in notifying family overseas, verifying identity, and issuing repatriation / passport documents.',
+              '3. <strong>Hospital & Coroner Procedures:</strong> Non-eligible persons pay non-subsidized public hospital rates. Sudden/accidental deaths are referred to the Coroner; always keep the Police Report Number.',
+              '4. <strong>If Family Cannot Fly Immediately:</strong> After local cremation, ashes can be stored officially with FEHD for <strong>HK$80/month</strong> (Form FEHB 251) until relatives can safely travel to Hong Kong.'
+            ]
+          }
+        ],
+        aiTitle: '🤖 AI Peace-of-Mind Guide (Admin Explainer)',
+        aiDesc: '24/7 calm, clear guidance on HK 2026 afterlife laws, anti-scam verification, overseas family contingency, and helper/tourist emergency procedures. Educational only.',
+        aiWelcome: 'Hello! I am the AI Guide for HK Afterlife Guide. I can calmly explain HK 2026 end-of-life rules, anti-scam checks, overseas family ash storage, or emergency steps for domestic helpers and tourists in HK. How can I help you today?',
+        aiPrompts: [
+          'What is the new 2026 Advance Medical Directive law in HK?',
+          'What should a tourist family do if an accident happens in HK?',
+          'What are the employer duties if a domestic helper passes away in HK?',
+          'How do I verify a licensed funeral undertaker or legal charity in HK?'
+        ],
+        deafPresets: [
+          'I have hearing difficulty. Please communicate with me in writing. Thank you. (我有聽覺困難，請用文字溝通)',
+          'EMERGENCY: I am a visitor / domestic helper. Please call 999 and contact my Consulate. (緊急求助：請幫我報警 999 及聯絡領事館)',
+          'Please provide an official itemized written quotation. No verbal quotes. (請提供正式書面分項報價單)',
+          'Please help contact my employer or Travel Insurance 24-hr hotline. (請協助聯絡我的僱主或旅遊保險 24 小時熱線)'
+        ],
+        speechLang: 'en-GB'
+      },
+      'id': {
+        appTitle: 'Panduan Darurat & Akhir Hayat HK',
+        appSubtitle: 'V1.2 | Gratis & Nirlaba untuk PMI / Wisatawan',
+        contrast: 'Kontras',
+        deafBtn: 'Kartu Tuli',
+        qrBtn: 'Bagikan QR',
+        readAloud: 'Dengar',
+        rateSlow: '0.75x Pelan',
+        rateNormal: '1.0x Normal',
+        fabAi: 'Tanya AI',
+        aiSend: 'Kirim ➤',
+        aiPlaceholder: 'Ketik pertanyaan atau tekan 🎤 untuk berbicara...',
+        bannerTitle: '🌱 Prinsip Nirlaba & Pemberitahuan: ',
+        bannerText: 'Platform ini 100% gratis dan TIDAK memungut biaya atau komisi apa pun. Program ini dapat diubah atau dibatalkan sewaktu-waktu karena penyesuaian desain atau keadaan kahar.',
+        nav: {
+          elder: 'Buku Lansia', family: 'Daftar Keluarga', helper: 'Darurat PMI/Turis',
+          ai: 'Pemandu AI', niche: 'Kalender Abu', quiz: 'Kuis Hukum 2026',
+          directory: 'Anti-Penipuan', festival: 'Cuaca & Amal'
+        },
+        helperTitle: '🌍 Panduan Darurat Kecelakaan / Meninggal di Hong Kong (PMI & Wisatawan)',
+        helperSubtitle: 'Informasi resmi untuk Pekerja Migran Indonesia (PMI), majikan, dan wisatawan di Hong Kong: hak pemulangan jenazah, KJRI, dan pencegahan penipuan.',
+        btnShowCard: 'Tampilkan Kartu SOS Besar',
+        consulateTitle: '🏛️ KJRI Hong Kong, Konsulat & LSM Bantuan PMI',
+        helperAntiScam: '⚠️ Waspada Penipuan: KJRI dan Departemen Tenaga Kerja HK TIDAK PERNAH meminta transfer ke rekening pribadi lewat WhatsApp. Sesuai Kontrak Kerja Standar, jika PMI meninggal saat masa kontrak, majikan wajib menanggung biaya pemulangan jenazah dan barang pribadi ke Indonesia.',
+        hotlines: [
+          { icon: '🚨', name: 'Polisi / Ambulans / Damkar', num: '999', note: 'Gratis 24 Jam | Tersedia layanan penerjemah' },
+          { icon: '🇮🇩', name: 'KJRI Hong Kong (Telp Resmi)', num: '3651 0200', note: 'Causeway Bay | Bantuan warga negara & PMI' },
+          { icon: '👷', name: 'Hotline PMI Depnaker HK 24 Jam', num: '2157 9537', note: 'Tersedia layanan Bahasa Indonesia' },
+          { icon: '🛡️', name: 'Polisi HK Anti-Penipuan', num: '18222', note: '24 Jam | Cek nomor mencurigakan sebelum transfer' }
+        ],
+        scenarios: [
+          {
+            title: '🏠 Pekerja Migran Indonesia (PMI): Kecelakaan atau Meninggal di HK',
+            points: [
+              '1. <strong>Hubungi 999 Segera:</strong> Jika terjadi kecelakaan serius, segera hubungi <strong>999</strong> ke IGD rumah sakit umum. Majikan wajib memberikan perawatan medis gratis sesuai kontrak.',
+              '2. <strong>Lapor Kecelakaan Kerja:</strong> Jika meninggal akibat kecelakaan kerja, majikan wajib melapor ke Departemen Tenaga Kerja HK dalam waktu 7 hari.',
+              '3. <strong>Kewajiban Pemulangan Jenazah:</strong> Berdasarkan Kontrak Kerja Standar HK, <strong>majikan wajib menanggung biaya pemulangan jenazah dan barang pribadi PMI ke Indonesia</strong> (segera cek polis asuransi pekerja).',
+              '4. <strong>Hubungi KJRI Hong Kong (3651 0200):</strong> Koordinasikan surat pemulangan dan kontak keluarga langsung melalui KJRI. Jangan pernah transfer uang ke calo WhatsApp!'
+            ]
+          },
+          {
+            title: '✈️ Wisatawan Indonesia di Hong Kong: Langkah Darurat',
+            points: [
+              '1. <strong>Hubungi Hotline 24 Jam Asuransi Perjalanan:</strong> Buka nomor kasus asuransi sebelum membayar deposit rumah sakit atau pemulangan jenazah.',
+              '2. <strong>Lapor ke KJRI Hong Kong:</strong> Untuk verifikasi dokumen paspor, surat izin pemulangan, dan pemberitahuan keluarga di tanah air.',
+              '3. <strong>Simpan Nomor Laporan Polisi:</strong> Kematian mendadak/kecelakaan akan diperiksa Koroner Hong Kong. Simpan semua kwitansi resmi.',
+              '4. <strong>Penyimpanan Abu Sementara Resmi (HK$80/bulan):</strong> Jika memilih kremasi dan keluarga belum bisa segera terbang ke HK, abu dapat disimpan aman di FEHD (Formulir FEHB 251).'
+            ]
+          }
+        ],
+        aiTitle: '🤖 Pemandu AI (Penjelas 24 Jam)',
+        aiDesc: 'Tanyakan prosedur darurat di Hong Kong, hak PMI, KJRI, asuransi wisata, atau verifikasi anti-penipuan dalam Bahasa Indonesia.',
+        aiWelcome: 'Halo! Saya Pemandu AI HK Afterlife Guide. Jika Anda membutuhkan bantuan informasi darurat di Hong Kong (hak PMI, kontak KJRI, rumah sakit, atau cara menghindari penipuan), silakan tanyakan di sini. Layanan ini gratis dan non-komersial.',
+        aiPrompts: [
+          'Apa langkah darurat jika PMI mengalami kecelakaan atau meninggal di Hong Kong?',
+          'Bagaimana cara menghubungi KJRI Hong Kong dan Departemen Tenaga Kerja?',
+          'Apakah majikan wajib menanggung biaya pemulangan jenazah PMI?',
+          'Bagaimana cara mengecek lembaga amal atau jasa pemakaman resmi di HK?'
+        ],
+        deafPresets: [
+          'DARURAT: Saya warga Indonesia / PMI. Tolong hubungi 999 dan KJRI Hong Kong. (緊急求助：我係印尼籍外傭/旅客，請幫我報警 999 及聯絡印尼駐港總領事館)',
+          'Saya mengalami gangguan pendengaran, mohon berkomunikasi dengan tulisan. (我有聽覺困難，請用文字溝通)',
+          'Tolong hubungi majikan saya atau asuransi perjalanan saya. (請幫我聯絡僱主或旅遊保險公司)',
+          'Mohon berikan rincian biaya tertulis resmi. (請提供正式書面收費明細)'
+        ],
+        speechLang: 'id-ID'
+      },
+      'tl': {
+        appTitle: 'HK Afterlife & Emergency Guide',
+        appSubtitle: 'V1.2 | Libreng Gabay para sa OFW at Turista sa HK',
+        contrast: 'Contrast',
+        deafBtn: 'Deaf Card',
+        qrBtn: 'I-share QR',
+        readAloud: 'Pakinggan',
+        rateSlow: '0.75x Mabagal',
+        rateNormal: '1.0x Normal',
+        fabAi: 'Magtanong sa AI',
+        aiSend: 'Ipadala ➤',
+        aiPlaceholder: 'Isulat ang tanong o pindutin ang 🎤...',
+        bannerTitle: '🌱 Walang Bayad at Paalala: ',
+        bannerText: 'Ang platform na ito ay 100% libre at HINDI kumukuha ng anumang bayad o komisyon. Maaaring baguhin o kanselahin ang proyektong ito dahil sa disenyo o force majeure.',
+        nav: {
+          elder: 'Gabay ng Nakatatanda', family: 'Checklist ng Pamilya', helper: 'OFW & Turista SOS',
+          ai: 'AI Tagapagpaliwanag', niche: 'Kalendaryo', quiz: 'Batas 2026',
+          directory: 'Iwas-Scam', festival: 'Trapiko at Kawanggawa'
+        },
+        helperTitle: '🌍 Gabay sa Aksidente / Pagpanaw sa Hong Kong (Para sa OFW at Turista)',
+        helperSubtitle: 'Opisyal na gabay para sa mga Filipino Domestic Helper (OFW), amo, at bisita sa Hong Kong: karapatan sa repatriation, Konsulado ng Pilipinas, at iwas-scam.',
+        btnShowCard: 'Ipakita ang Malaking SOS Card',
+        consulateTitle: '🏛️ Philippine Consulate General HK at Mga Suportang Organisasyon',
+        helperAntiScam: '⚠️ Babala sa Scam: Ang Konsulado at HK Labour Dept ay HINDI humihingi ng pera sa personal na bank account sa WhatsApp. Sa ilalim ng Standard Employment Contract, kung pumanaw ang helper habang nasa kontrata, obligasyon ng amo ang gastos sa pagpapauwi ng labi at gamit sa Pilipinas.',
+        hotlines: [
+          { icon: '🚨', name: 'Pulis / Ambulansya / Bumbero', num: '999', note: '24/7 Libre | May tulong sa English at interpreter' },
+          { icon: '🇵🇭', name: 'Philippine Consulate General HK', num: '2823 8500', note: 'Admiralty United Centre | ATN at MWO para sa OFW' },
+          { icon: '👷', name: 'HK Labour Dept FDH 24h Hotline', num: '2157 9537', note: 'May serbisyong Tagalog para sa domestic helper' },
+          { icon: '🛡️', name: 'HK Police Anti-Scam Helpline', num: '18222', note: '24/7 upang i-check ang kahina-hinalang ahente' }
+        ],
+        scenarios: [
+          {
+            title: '🏠 Filipino Domestic Helper (OFW): Aksidente o Pagpanaw sa HK',
+            points: [
+              '1. <strong>Tumawag Agad sa 999:</strong> Para sa malubhang aksidente, tumawag sa <strong>999</strong>. Obligasyon ng amo na magbigay ng libreng pagpapagamot sa ilalim ng kontrata.',
+              '2. <strong>Pag-uulat ng Work Injury:</strong> Kung ang pagpanaw ay dahil sa aksidente sa trabaho, kailangang i-report ng amo sa HK Labour Dept sa loob ng 7 araw.',
+              '3. <strong>Karapatan sa Repatriation:</strong> Kung pumanaw ang OFW habang nasa kontrata, <strong>pananagutan ng amo ang gastos sa pagpapauwi ng labi at personal na gamit sa Pilipinas</strong> (tingnan agad ang helper insurance).',
+              '4. <strong>Makipag-ugnayan sa Philippine Consulate (2823 8500):</strong> Humingi ng tulong sa ATN / MWO. Huwag magpadala ng pera sa hindi kilalang ahente sa WhatsApp.'
+            ]
+          },
+          {
+            title: '✈️ Mga Turistang Pilipino sa Hong Kong: Emergency Steps',
+            points: [
+              '1. <strong>Tawagan ang Travel Insurance 24h Hotline:</strong> Kumuha ng case number bago magbayad ng malaking deposito sa ospital o repatriation.',
+              '2. <strong>Ipagbigay-alam sa Konsulado ng Pilipinas:</strong> Para sa tulong sa dokumento, pasaporte, at pagkontak sa pamilya sa Pilipinas.',
+              '3. <strong>Itago ang Police Report Number:</strong> Ang biglaang pagpanaw ay sinusuri ng HK Coroner. Itabi lahat ng opisyal na resibo.',
+              '4. <strong>Pansamantalang Pag-iimbak ng Abo (HK$80/buwan):</strong> Kung hindi agad makalipad ang pamilya, maaaring itabi ang abo sa FEHD (Form FEHB 251) hanggang makapunta sa HK.'
+            ]
+          }
+        ],
+        aiTitle: '🤖 AI Tagapagpaliwanag (24/7 Guide)',
+        aiDesc: 'Magtanong sa Tagalog tungkol sa emergency steps sa Hong Kong, karapatan ng OFW, Konsulado, o anti-scam verification.',
+        aiWelcome: 'Kumusta! Ako ang AI Guide ng HK Afterlife Guide. Handa akong tumulong magpaliwanag ng mga hakbang sa emergency sa Hong Kong para sa mga OFW, turista, at pamilya. Libre ito at walang bentahan. Ano ang maitutulong ko?',
+        aiPrompts: [
+          'Ano ang dapat gawin kung naaksidente o pumanaw ang isang OFW sa Hong Kong?',
+          'Paano makipag-ugnayan sa Philippine Consulate at HK Labour Dept?',
+          'Sino ang magbabayad ng pagpapauwi ng labi ng domestic helper?',
+          'Paano masisiguro na legal at hindi scam ang isang charity o funeral service?'
+        ],
+        deafPresets: [
+          'EMERGENCY: Ako ay Pilipino / OFW. Pakitawagan ang 999 at Philippine Consulate HK. (緊急求助：我係菲律賓籍外傭/旅客，請幫我報警 999 及聯絡菲律賓駐港總領事館)',
+          'Nahihirapan akong makarinig. Pakisulat na lang po ang mensahe. (我有聽覺困難，請用文字溝通)',
+          'Pakikontak po ang aking amo o travel insurance hotline. (請幫我聯絡僱主或旅遊保險)',
+          'Paki-bigay po ng opisyal na nakasulat na quotation. (請提供正式書面報價單)'
+        ],
+        speechLang: 'fil-PH'
+      },
+      'ja': {
+        appTitle: '香港あんしん終活・緊急ガイド',
+        appSubtitle: 'V1.2｜完全無料・非営利サポート',
+        contrast: '高コントラスト',
+        deafBtn: '筆談カード',
+        qrBtn: 'QR共有',
+        readAloud: '読み上げ',
+        rateSlow: '0.75x ゆっくり',
+        rateNormal: '1.0x 標準',
+        fabAi: 'AI案内員に質問',
+        aiSend: '送信 ➤',
+        aiPlaceholder: '質問を入力、または 🎤 で音声入力...',
+        bannerTitle: '🌱 非営利宣言とご案内：',
+        bannerText: '本サイトは金銭的利益や手数料を一切受け取りません。設計変更や不可抗力により計画が変更・中止される場合があります。',
+        nav: {
+          elder: '高齢者ノート', family: '遺族チェック', helper: '旅行者・緊急SOS',
+          ai: 'AI案内員', niche: '納骨カレンダー', quiz: '2026年法クイズ',
+          directory: '詐欺防止名簿', festival: '交通天気・寄付'
+        },
+        helperTitle: '🌍 香港滞在中の旅行者・駐在員・家事労働者向け緊急ガイド',
+        helperSubtitle: '香港滞在中に万が一の事故・急病・ご逝去が発生した際の救急通報、領事館連絡、海外旅行保険および詐欺防止の手順です。',
+        btnShowCard: '大型バイリンガルSOSカード表示',
+        consulateTitle: '🏛️ 在香港日本国総領事館および主要領事館・支援機関',
+        helperAntiScam: '⚠️ 詐欺注意：領事館や香港当局がWhatsApp等で個人口座への振込を求めることはありません。旅行者は必ず海外旅行保険の24時間デスクと日本国総領事館へ直接ご連絡ください。',
+        hotlines: [
+          { icon: '🚨', name: '警察・救急・消防 (999)', num: '999', note: '24時間無料｜英語対応・通訳手配可' },
+          { icon: '🇯🇵', name: '在香港日本国総領事館', num: '2522 1184', note: '24時間緊急対応（邦人援護・急病・事故）' },
+          { icon: '💬', name: '聴覚障害者向け緊急SMS', num: '992', note: '香港警察へ事前登録済みの方対象' },
+          { icon: '🛡️', name: '香港警察 詐欺対策ホットライン', num: '18222', note: '24時間｜不審な請求や仲介業者の確認' }
+        ],
+        scenarios: [
+          {
+            title: '✈️ 日本人旅行者・駐在員：香港での緊急事故・ご逝去時の手順',
+            points: [
+              '1. <strong>999通報と海外旅行保険24時間デスクへ連絡：</strong>高額な医療費やご遺体搬送費を自己負担する前に、必ず保険会社の緊急サポートへ連絡し受付番号を取得してください。',
+              '2. <strong>在香港日本国総領事館（2522 1184）へ連絡：</strong>24時間緊急対応。ご家族への連絡支援、死亡証明書・搬送手続きに関する公式案内を受けられます。',
+              '3. <strong>公立病院・検視官（Coroner）手続き：</strong>突然死や事故死は警察から検視官へ引き継がれます。警察の事件番号（Report Number）を必ず控えてください。',
+              '4. <strong>ご家族がすぐ渡航できない場合：</strong>香港で火葬後、香港食物環境衛生署（FEHD）の公式一時保管（月80香港ドル、申請書 FEHB 251）を利用し、後日安全にお引き取りいただけます。'
+            ]
+          },
+          {
+            title: '🏠 外国人住み込み家事労働者（ヘルパー）に関する法定規定',
+            points: [
+              '1. <strong>無料医療と労災届出：</strong>標準雇用契約により雇用主は医療費を負担します。労災死亡時は7日以内に香港労働処へ届出が必要です。',
+              '2. <strong>ご遺体本国送還費用：</strong>契約期間中の逝去時は、雇用主がご遺体および私物の本国送還費用を負担する法的義務があります。',
+              '3. <strong>労働処24時間ホットライン：</strong>2157 9537 または各国総領事館へ直接ご確認ください。'
+            ]
+          }
+        ],
+        aiTitle: '🤖 AIあんしん案内員',
+        aiDesc: '香港での緊急対応、旅行保険・領事館手順、2026年香港法制度や詐欺対策を日本語で分かりやすくご案内します。',
+        aiWelcome: 'こんにちは！香港あんしん終活・緊急ガイドのAI案内員です。香港での万が一の事故や手続き、領事館への連絡方法、詐欺防止の確認など、お気軽にご質問ください。',
+        aiPrompts: [
+          '香港旅行中に万が一の事故や不幸が起きた場合の初期対応は？',
+          '在香港日本国総領事館と緊急通報（999）の使い方は？',
+          '海外の家族がすぐ香港へ渡航できない場合、遺骨の一時保管は可能ですか？',
+          '香港の公式葬儀業者や合法慈善団体の確認方法は？'
+        ],
+        deafPresets: [
+          '緊急：日本人旅行者です。999通報と日本国総領事館への連絡をお願いします。(緊急求助：我係日本旅客，請幫我報警 999 及聯絡日本駐港總領事館)',
+          '耳が聞こえにくいため、筆談でお願いします。(我有聽覺困難，請用文字溝通)',
+          '海外旅行保険の緊急連絡先へ連絡したいです。(請協助聯絡我的旅遊保險公司)',
+          '公式な書面の見積書を提示してください。(請提供正式書面報價單)'
+        ],
+        speechLang: 'ja-JP'
+      },
+      'ko': {
+        appTitle: '홍콩 안심 사후·긴급 가이드',
+        appSubtitle: 'V1.2 | 비영리 무료 공익 플랫폼',
+        contrast: '고대비',
+        deafBtn: '청각장애 카드',
+        qrBtn: 'QR 공유',
+        readAloud: '음성듣기',
+        rateSlow: '0.75x 느리게',
+        rateNormal: '1.0x 보통',
+        fabAi: 'AI 안내원 질문',
+        aiSend: '보내기 ➤',
+        aiPlaceholder: '질문을 입력하거나 🎤 버튼을 눌러 말씀하세요...',
+        bannerTitle: '🌱 비영리 원칙 및 안내: ',
+        bannerText: '본 플랫폼은 일체의 금전적 이익이나 수수료를 받지 않습니다. 설계 변경이나 불가항력으로 인해 계획이 변경되거나 취소될 수 있습니다.',
+        nav: {
+          elder: '어르신 안내서', family: '가족 체크리스트', helper: '여행객·긴급SOS',
+          ai: 'AI 안내원', niche: '봉안당 달력', quiz: '2026 법령 퀴즈',
+          directory: '사기예방 명부', festival: '교통날씨·기부'
+        },
+        helperTitle: '🌍 홍콩 체류 여행객 및 외국인 가사도우미 긴급 사고 가이드',
+        helperSubtitle: '홍콩 체류 중 갑작스러운 사고나 사망 시 긴급신고(999), 주홍콩 대한민국 총영사관 연락, 여행자보험 및 사기 예방 절차 안내입니다.',
+        btnShowCard: '대형 이중언어 SOS 카드 보기',
+        consulateTitle: '🏛️ 주홍콩 대한민국 총영사관 및 주요 영사관·지원기관',
+        helperAntiScam: '⚠️ 사기 주의: 영사관과 홍콩 정부기관은 절대 메신저로 개인 계좌 이체를 요구하지 않습니다. 여행객은 즉시 해외여행자보험 24시간 긴급지원센터와 총영사관에 연락하세요.',
+        hotlines: [
+          { icon: '🚨', name: '경찰·구급·소방 긴급신고', num: '999', note: '24시간 무료 | 영어 및 통역 지원' },
+          { icon: '🇰🇷', name: '주홍콩 대한민국 총영사관', num: '2529 4141', note: '긴급 사건사고 영사 조력 (공식 홈페이지 긴급전화 확인)' },
+          { icon: '💬', name: '청각장애 긴급 문자 신고', num: '992', note: '홍콩 경찰 사전 등록 청각·언어 장애인 전용' },
+          { icon: '🛡️', name: '홍콩 경찰 사기예방 센터', num: '18222', note: '24시간 | 의심스러운 브로커 및 계좌 확인' }
+        ],
+        scenarios: [
+          {
+            title: '✈️ 한국인 여행객·체류자: 홍콩 긴급 사고 및 사망 시 대처',
+            points: [
+              '1. <strong>999 신고 및 해외여행자보험 24시간 센터 연락:</strong> 고액의 병원비나 운구 비용을 결제하기 전 반드시 보험사 긴급지원센터에 사건을 접수하세요.',
+              '2. <strong>주홍콩 대한민국 총영사관 (2529 4141) 연락:</strong> 가족 연락, 사망증명서 및 유해/유골 국내 운구 절차에 대한 공식 영사 조력을 받을 수 있습니다.',
+              '3. <strong>병원 및 검시관(Coroner) 절차:</strong> 사고사나 돌연사는 홍콩 검시관 조사를 거치므로 경찰 신고번호(Report Number)와 영수증을 반드시 보관하세요.',
+              '4. <strong>가족이 당장 홍콩에 오기 어려운 경우:</strong> 현지 화장 후 홍콩 식품환경위생서(FEHD) 공식 유골 임시 보관(월 HK$80, 서식 FEHB 251)을 이용하면 안전하게 보관 후 추후 수령 가능합니다.'
+            ]
+          },
+          {
+            title: '🏠 홍콩 외국인 가사도우미(FDH) 법적 보호 안내',
+            points: [
+              '1. <strong>무료 의료 및 산재 신고:</strong> 표준근로계약에 따라 고용주는 무료 의료를 제공하며, 업무상 사망 시 7일 이내 홍콩 노동처에 신고해야 합니다.',
+              '2. <strong>유해 본국 송환 의무:</strong> 계약 기간 중 사망 시 고용주가 유해 및 개인 소지품의 본국 송환 비용을 부담할 법적 책임이 있습니다.',
+              '3. <strong>노동처 24시간 핫라인:</strong> 2157 9537 및 해당 국가 총영사관을 통해 공식 지원받으세요.'
+            ]
+          }
+        ],
+        aiTitle: '🤖 AI 안심 안내원',
+        aiDesc: '홍콩 긴급 사고 대처, 영사관 연락, 2026 홍콩 관련 법령 및 사기 예방 확인을 한국어로 안내합니다.',
+        aiWelcome: '안녕하세요! 홍콩 안심 가이드 AI 안내원입니다. 홍콩 여행 중 긴급 상황 대처나 현지 절차, 사기 예방 확인 등 궁금한 점을 편하게 물어보세요.',
+        aiPrompts: [
+          '홍콩 여행 중 갑작스러운 사고나 사망 시 초기 대처 절차는?',
+          '주홍콩 대한민국 총영사관 및 999 신고 방법은?',
+          '가족이 당장 홍콩에 오지 못할 때 유골 임시 보관 방법은?',
+          '홍콩 합법 장례업체 및 자선단체 확인 방법은?'
+        ],
+        deafPresets: [
+          '긴급: 한국인 방문객입니다. 999 신고와 한국 총영사관 연락을 도와주세요. (緊急求助：我係韓國旅客，請幫我報警 999 及聯絡韓國駐港總領事館)',
+          '청각에 어려움이 있습니다. 글로 소통해 주세요. (我有聽覺困難，請用文字溝通)',
+          '여행자보험 긴급 핫라인 연락을 도와주세요. (請協助聯絡旅遊保險公司)',
+          '공식 서면 견적서를 보여주세요. (請提供正式書面報價單)'
+        ],
+        speechLang: 'ko-KR'
+      },
+      'th': {
+        appTitle: 'คู่มือฉุกเฉินและจัดการเรื่องท้ายชีวิต ฮ่องกง',
+        appSubtitle: 'V1.2 | แพลตฟอร์มการกุศลฟรี ไม่แสวงหากำไร',
+        contrast: 'สีตัดกันสูง',
+        deafBtn: 'บัตรผู้พิการหู',
+        qrBtn: 'แชร์ QR',
+        readAloud: 'ฟังเสียง',
+        rateSlow: '0.75x ช้า',
+        rateNormal: '1.0x ปกติ',
+        fabAi: 'ถามผู้ช่วย AI',
+        aiSend: 'ส่งคำถาม ➤',
+        aiPlaceholder: 'พิมพ์คำถาม หรือกด 🎤 เพื่อพูด...',
+        bannerTitle: '🌱 หลักการไม่แสวงหากำไรและคำเตือน: ',
+        bannerText: 'แพลตฟอร์มนี้ฟรี 100% ไม่รับเงินหรือค่าคอมมิชชันใดๆ โครงการนี้อาจมีการปรับเปลี่ยนหรือยกเลิกได้ตามความเหมาะสมหรือเหตุสุดวิสัย',
+        nav: {
+          elder: 'สมุดผู้สูงอายุ', family: 'เช็กลิสต์ครอบครัว', helper: 'ฉุกเฉินแรงงาน/นักท่องเที่ยว',
+          ai: 'ผู้ช่วย AI', niche: 'ปฏิทินช่องเก็บอัฐิ', quiz: 'กฎหมาย 2026',
+          directory: 'ป้องกันมิจฉาชีพ', festival: 'จราจรและทำบุญ'
+        },
+        helperTitle: '🌍 คู่มือฉุกเฉินสำหรับแรงงานไทยและนักท่องเที่ยวในฮ่องกง',
+        helperSubtitle: 'ขั้นตอนฉุกเฉินเมื่อเกิดอุบัติเหตุหรือเสียชีวิตในฮ่องกง สิทธิตามสัญญาจ้างแม่บ้าน สถานกงสุลใหญ่ ณ เมืองฮ่องกง และการป้องกันมิจฉาชีพ',
+        btnShowCard: 'แสดงบัตรขอความช่วยเหลือตัวใหญ่',
+        consulateTitle: '🏛️ สถานกงสุลใหญ่ ณ เมืองฮ่องกง และหน่วยงานช่วยเหลือ',
+        helperAntiScam: '⚠️ เตือนภัยมิจฉาชีพ: สถานกงสุลและกรมแรงงานฮ่องกงไม่เคยขอให้โอนเงินเข้าบัญชีส่วนตัวผ่าน WhatsApp ตามสัญญาจ้างมาตรฐาน หากแม่บ้านเสียชีวิตระหว่างสัญญา นายจ้างต้องรับผิดชอบค่าส่งศพและทรัพย์สินกลับประเทศ',
+        hotlines: [
+          { icon: '🚨', name: 'ตำรวจ / รถพยาบาล / ดับเพลิง', num: '999', note: 'ฟรี 24 ชม. | รองรับภาษาอังกฤษและล่ามแปลภาษา' },
+          { icon: '🇹🇭', name: 'สถานกงสุลใหญ่ ณ เมืองฮ่องกง', num: '2521 6481', note: 'ช่วยเหลือคนไทยในฮ่องกงกรณีฉุกเฉินและเอกสาร' },
+          { icon: '👷', name: 'สายด่วนแรงงานแม่บ้านฮ่องกง 24 ชม.', num: '2157 9537', note: 'มีบริการภาษาไทยและหลายภาษา' },
+          { icon: '🛡️', name: 'ตำรวจฮ่องกงป้องกันมิจฉาชีพ', num: '18222', note: '24 ชม. | ตรวจสอบนายหน้าหรือบัญชีต้องสงสัย' }
+        ],
+        scenarios: [
+          {
+            title: '🏠 แรงงานแม่บ้านไทยในฮ่องกง (FDH): อุบัติเหตุหรือเสียชีวิต',
+            points: [
+              '1. <strong>โทร 999 ทันที:</strong> หากเกิดอุบัติเหตุรุนแรง โทร <strong>999</strong> ส่งโรงพยาบาลรัฐ นายจ้างต้องรับผิดชอบค่ารักษาพยาบาลฟรีตามสัญญาจ้างมาตรฐาน',
+              '2. <strong>แจ้งอุบัติเหตุจากการทำงาน:</strong> หากเสียชีวิตจากการทำงาน นายจ้างต้องแจ้งกรมแรงงานฮ่องกงภายใน 7 วัน',
+              '3. <strong>สิทธิการส่งศพกลับประเทศ:</strong> ตามสัญญาจ้างมาตรฐานฮ่องกง <strong>นายจ้างมีหน้าที่ตามกฎหมายในการจ่ายค่าส่งศพและทรัพย์สินส่วนตัวกลับประเทศไทย</strong> (ตรวจสอบประกันแม่บ้านทันที)',
+              '4. <strong>ติดต่อสถานกงสุลใหญ่ไทย (2521 6481):</strong> ประสานงานเอกสารและแจ้งญาติที่ไทยโดยตรง ห้ามโอนเงินให้นายหน้าแปลกหน้าทาง WhatsApp'
+            ]
+          },
+          {
+            title: '✈️ นักท่องเที่ยวไทยในฮ่องกง: ขั้นตอนฉุกเฉิน',
+            points: [
+              '1. <strong>ติดต่อสายด่วน 24 ชม. ประกันการเดินทาง:</strong> เปิดหมายเลขเคสก่อนชำระเงินมัดจำโรงพยาบาลหรือค่าส่งศพ',
+              '2. <strong>แจ้งสถานกงสุลใหญ่ ณ เมืองฮ่องกง:</strong> เพื่อขอรับคำแนะนำเรื่องเอกสารและติดต่อครอบครัวในไทย',
+              '3. <strong>เก็บหมายเลขแจ้งความตำรวจ:</strong> กรณีเสียชีวิตกะทันหันหรืออุบัติเหตุจะมีกระบวนการชันสูตรของศาลฮ่องกง',
+              '4. <strong>ฝากอัฐิชั่วคราวกับรัฐบาลฮ่องกง (HK$80/เดือน):</strong> หากครอบครัวไม่สามารถบินมาได้ทันที สามารถฌาปนกิจและฝากอัฐิไว้กับ FEHD (แบบฟอร์ม FEHB 251) อย่างปลอดภัย'
+            ]
+          }
+        ],
+        aiTitle: '🤖 ผู้ช่วย AI อธิบายข้อมูล 24 ชม.',
+        aiDesc: 'สอบถามขั้นตอนฉุกเฉินในฮ่องกง สิทธิแรงงาน สถานกงสุลไทย หรือการตรวจสอบมิจฉาชีพเป็นภาษาไทยได้ฟรี',
+        aiWelcome: 'สวัสดีครับ! ผมคือผู้ช่วย AI ของ HK Afterlife Guide ยินดีให้ข้อมูลขั้นตอนฉุกเฉินในฮ่องกง สิทธิแรงงานแม่บ้าน นักท่องเที่ยว และการป้องกันมิจฉาชีพครับ มีเรื่องใดให้ช่วยไหมครับ?',
+        aiPrompts: [
+          'หากคนไทยหรือนักท่องเที่ยวเกิดอุบัติเหตุในฮ่องกงต้องทำอย่างไร?',
+          'ติดต่อสถานกงสุลใหญ่ไทย ณ เมืองฮ่องกง และเบอร์ฉุกเฉิน 999 อย่างไร?',
+          'แม่บ้านเสียชีวิตระหว่างสัญญาในฮ่องกง นายจ้างต้องรับผิดชอบอะไรบ้าง?',
+          'วิธีตรวจสอบองค์กรการกุศลหรือบริษัทจัดงานศพที่ถูกกฎหมายในฮ่องกง?'
+        ],
+        deafPresets: [
+          'ฉุกเฉิน: ฉันเป็นคนไทย กรุณาโทร 999 และติดต่อสถานกงสุลไทยในฮ่องกง (緊急求助：我係泰國籍外傭/旅客，請幫我報警 999 及聯絡泰國駐港總領事館)',
+          'ฉันมีปัญหาการได้ยิน กรุณาสื่อสารด้วยการเขียน (我有聽覺困難，請用文字溝通)',
+          'กรุณาช่วยติดต่อนายจ้างหรือประกันการเดินทางของฉัน (請協助聯絡僱主或旅遊保險公司)',
+          'กรุณาแสดงใบเสนอราคาอย่างเป็นทางการเป็นลายลักษณ์อักษร (請提供正式書面報價單)'
+        ],
+        speechLang: 'th-TH'
+      }
+    };
+
+    /* ---------------------------------------------------------
+       3. 長者《我的安心交帶手冊》結構 (可多選 + 不適用)
+       --------------------------------------------------------- */
+    const ELDER_SCHEMA = [
+      {
+        id: 'sec_basic',
+        title: '第一部分：基本資料與緊急聯絡人',
+        desc: '只需填寫基本稱呼及聯絡電話，切勿寫入銀行密碼或網上登入密碼。',
+        fields: [
+          { type: 'text', id: 'elder_name', label: '本人姓名（中／英文）', placeholder: '例如：陳大文 / Chan Tai Man' },
+          { type: 'text', id: 'elder_contact1', label: '第一緊急聯絡人（姓名、關係、電話／WhatsApp）', placeholder: '例如：陳小明（兒子）9123-4567' },
+          { type: 'text', id: 'elder_contact2', label: '後備聯絡人／海外家人或教友社工（如適用，無可填「不適用」）', placeholder: '例如：陳小芬（女兒・英國）+44-xxxx / 不適用' }
+        ]
+      },
+      {
+        id: 'sec_treasures',
+        title: '第二部分：「平安三寶」與單身遺產備忘',
+        desc: '可多項剔取你已辦理的文件；如全部未辦或暫不打算處理，可揀「不適用／暫不決定」。',
+        fields: [
+          {
+            type: 'multi',
+            id: 'treasures_done',
+            label: '我已正式辦理以下具法律效力的文件（可多選）：',
+            options: [
+              '已立「平安紙（遺囑）」',
+              '已立「持久授權書 (EPA)」',
+              '已立「預設醫療指示 (AMD)」並上載醫健通',
+              '打算日後再約律師／醫生辦理'
+            ],
+            hasNA: true,
+            naLabel: '不適用／全部未辦理'
+          },
+          {
+            type: 'single',
+            id: 'solo_estate_reminder',
+            label: '【重要提醒】若本人單身或日後無親人認領剩餘遺產（扣除費用後）：',
+            options: [
+              '我明白單靠本手冊沒有法律效力；我計劃／已透過正式「平安紙」寫明將剩餘遺產捐贈予合法慈善機構',
+              '我不立平安紙，明白依法經遺產管理官公告 5 年後無人認領將歸香港政府庫房'
+            ],
+            hasNA: true,
+            naLabel: '不適用（已有家人繼承／暫不決定）'
+          },
+          { type: 'text', id: 'treasures_location', label: '正本文件存放位置（或負責律師樓名稱，無可填不適用）', placeholder: '例如：睡房衣櫃紅色文件夾／李氏律師行' }
+        ]
+      },
+      {
+        id: 'sec_proxy',
+        title: '第三部分：突發獨居／海外家屬未能回港之應急代理與綠色殯葬決定',
+        desc: '萬一遇上家人突發意外、或海外子女因天災／戰亂／工作未能即時返港，預先寫明代理及逾時最終安排。',
+        fields: [
+          {
+            type: 'multi',
+            id: 'proxy_org',
+            label: '本人已正式向以下合法慈善機構登記／計劃查詢身後事支援（可多選）：',
+            options: [
+              '東華三院「圓滿人生服務／活得自在」',
+              '聖雅各福群會「後顧無憂規劃服務」',
+              '榕光社「夕陽之友」',
+              '善寧會／聖公會聖匠堂／地區長者中心社工',
+              '已委託在港親友／教友作協調人'
+            ],
+            hasNA: true,
+            naLabel: '不適用（家人均在港直接跟進）'
+          },
+          { type: 'text', id: 'proxy_ref', label: '已登記機構個案編號及負責社工／協調人聯絡（無可留空或填不適用）', placeholder: '例如：聖雅各個案編號 #xxxx（陳姑娘）' },
+          {
+            type: 'single',
+            id: 'ash_storage_wish',
+            label: '若海外家人一時未能返港，本人希望骨灰如何過渡處理：',
+            options: [
+              '先簡單院出火化，並申請食環署骨灰暫存（HK$80/月，FEHB 251）等家人日後返港再跟進',
+              '先交由已登記之合法慈善機構／宗教團體暫存，等家人日後接手',
+              '直接辦理簡單綠色殯葬，無需家人跨國奔波'
+            ],
+            hasNA: true,
+            naLabel: '不適用／交由當時協調人決定'
+          },
+          {
+            type: 'multi',
+            id: 'overdue_green_burial',
+            label: '【逾時最終決定】若最終沒有家人回港跟進，且超過政府／慈善機構存放期限，本人同意選擇免費綠色殯葬（可多選）：',
+            options: [
+              '同意於食環署「紀念花園」撒灰（免費）',
+              '同意安排「海上撒灰」（免費渡輪）',
+              '隨緣，由政府或合法慈善代理選擇最合適之免費綠色殯葬',
+              '希望為我開設免費「無盡思念」網上追思專頁',
+              '本人已登記食環署《綠色殯葬中央登記名冊》(FEHB 278)'
+            ],
+            hasNA: true,
+            naLabel: '不適用／不同意綠色殯葬（另有安排）'
+          }
+        ]
+      },
+      {
+        id: 'sec_medical_funeral',
+        title: '第四部分：醫療照顧、喪禮及宗教心願',
+        desc: '以下項目均可多項剔取，讓家人清楚你的心意，亦避免被不良中介推銷昂貴不必要項目。',
+        fields: [
+          {
+            type: 'multi',
+            id: 'funeral_style',
+            label: '喪禮形式及宗教偏好（可多選）：',
+            options: [
+              '一切從簡（醫院出殯／直出火葬場，免鋪張）',
+              '維新／無宗教溫馨追思儀式',
+              '佛教儀式',
+              '道教儀式',
+              '基督教／天主教安息禮拜',
+              '伊斯蘭教或其他宗教儀式',
+              '謝絕花牌／帛金（或建議將帛金直接捐給合法慈善機構）'
+            ],
+            hasNA: true,
+            naLabel: '不適用／全權交由家人決定'
+          },
+          {
+            type: 'multi',
+            id: 'medical_wishes',
+            label: '臨終照顧與器官捐贈心願（只供家人參考，可多選）：',
+            options: [
+              '希望重視紓緩痛楚、安詳走完最後一程',
+              '已登記衞生署中央器官捐贈登記名冊',
+              '希望捐贈遺體作大學「無言老師」醫學教學（須生前正式登記）',
+              '希望家人陪伴、播放我喜歡的音樂或誦經'
+            ],
+            hasNA: true,
+            naLabel: '不適用／暫無特別要求'
+          }
+        ]
+      },
+      {
+        id: 'sec_assets',
+        title: '第五部分：安全資產與賬戶索引（只記機構名稱，嚴禁寫密碼！）',
+        desc: '⚠️ 防騙防盜鐵律：千萬不要在此寫下提款卡密碼、網上銀行密碼或完整戶口號碼，只記錄「有哪些類別」即可。',
+        fields: [
+          {
+            type: 'multi',
+            id: 'asset_types',
+            label: '本人名下持有以下項目（供家人核對防遺漏，可多選）：',
+            options: [
+              '香港本地銀行儲蓄／定期戶口',
+              '強積金 (MPF)／退休金賬戶',
+              '人壽／醫療／危疾保險單',
+              '香港物業／公屋／居屋租約或業權',
+              '股票／基金／銀行保險箱',
+              '海外銀行戶口或資產',
+              '需取消之月費（手機、寬頻、水電煤、八達通自動增值）'
+            ],
+            hasNA: true,
+            naLabel: '不適用／已全部交由家人知悉'
+          },
+          { type: 'text', id: 'asset_note', label: '銀行／保險公司名稱及單據存放位置（切勿寫密碼！）', placeholder: '例如：匯豐銀行、保誠人壽；保單放在客廳抽屜第二格' }
+        ]
+      },
+      {
+        id: 'sec_other',
+        title: '第六部分：給家人的話、其他／補充事項與核實簽署',
+        desc: '簽署及日期只用於核實為本人最新心願紀錄，不具平安紙／遺囑之法律效力。',
+        fields: [
+          { type: 'textarea', id: 'heart_words', label: '給家人或親友的心底話（可按 🎤 講粵語自動轉文字）', placeholder: '例如：多謝大家一直以來的照顧，大家要保重身體，喪禮簡簡單單就好...' },
+          { type: 'textarea', id: 'other_notes', label: '其他／補充事項（如寵物託付、特別物品交給誰、舊照片位置等）', placeholder: '如沒有其他補充，可留空或填「不適用」' },
+          { type: 'text', id: 'sign_name', label: '填寫人姓名／（如手部不便：協助代筆人姓名）', placeholder: '例如：陳大文（本人填寫）', printInSignBox: true },
+          { type: 'text', id: 'sign_date', label: '填寫或最近檢視日期', placeholder: '例如：2026 年 11 月 26 日', printInSignBox: true }
+        ]
+      }
+    ];
+
+    /* ---------------------------------------------------------
+       4. 家屬《辦理身後事 5 階段清單》資料
+       --------------------------------------------------------- */
+    const FAMILY_STAGES = [
+      {
+        stageId: 'st1',
+        title: '階段一：離世當日及首 48 小時（冷靜處理・防受騙）',
+        items: [
+          { id: 'f1_1', text: '保持冷靜，向醫院或醫生領取《死因醫學證明書》（表格 18）', tip: '自然離世於醫院內通常 1–3 天內發出；如屬非自然死亡則轉交死因裁判官跟進。' },
+          { id: 'f1_2', text: '翻查長者《安心交帶手冊》及正本「平安三寶」，確認宗教、綠色殯葬或慈善代理安排', tip: '如海外家人未能回港，立即查閱本網「海外失聯與骨灰暫存」流程。' },
+          { id: 'f1_3', text: '核實持牌殮葬商資格，索取列明所有分項之書面報價單（絕不付不明訂金）', tip: '可到食環署網頁 10 秒查冊；如家境困難可向社署或合法慈善機構申請免費院出。' },
+          { id: 'f1_4', text: '通知近親及（如適用）聯絡已登記之合法慈善支援機構／宗教團體', tip: '可善用本頁上方「複製進度貼 WhatsApp」免重覆逐一解釋。' }
+        ]
+      },
+      {
+        stageId: 'st2',
+        title: '階段二：第 3 至 7 天（聯合辦事處一站式辦理證件與火化）',
+        items: [
+          { id: 'f2_1', text: '前往「聯合辦事處」（灣仔胡忠大廈 18 樓 或 深水埗長沙灣政府合署 1 樓）辦理死亡登記及領取死亡證', tip: '建議一併申請多份核證副本（核證死亡證）以便日後處理銀行及遺產。' },
+          { id: 'f2_2', text: '於聯合辦事處同步辦理《火葬許可證》並網上預約食環署公眾火葬時段', tip: '食環署承諾由申請翌日起計 15 天內提供火化時段。' },
+          { id: 'f2_3', text: '（如選土葬或外運遺體）辦理《土葬許可證》或遺體出境許可證', tip: '如選擇火化，此項請直接點選「不適用」。' },
+          { id: 'f2_4', text: '（如出殯需租用旅遊巴／靈車）完成本網「租車 8 點防坑核對」並確認書面車費', tip: '如選擇醫院直出簡單儀式不設接送，可選「不適用」。' }
+        ]
+      },
+      {
+        stageId: 'st3',
+        title: '階段三：第 1 至 4 星期（出殯、火化與領取骨灰）',
+        items: [
+          { id: 'f3_1', text: '舉行告別儀式／院出及前往火葬場火化', tip: '攜帶身份證明及火葬許可證正本。' },
+          { id: 'f3_2', text: '於火化後約 4 個工作天領取骨灰及《領取骨灰許可證》', tip: '可由持牌殮葬商或家屬親自領取，正本務必妥善保存。' },
+          { id: 'f3_3', text: '如未有龕位或海外家人未返港：申請食環署官方骨灰暫存（首 2 月免費，其後 HK$80/月，FEHB 251）', tip: '如已直接安排綠色殯葬或已有家族龕位，此項可點選「不適用」。' }
+        ]
+      },
+      {
+        stageId: 'st4',
+        title: '階段四：第 1 至 3 個月（安放骨灰・2026 每月龕位抽籤／綠色殯葬）',
+        items: [
+          { id: 'f4_1', text: '【2026 年 8 月新制】按月遞交食環署公眾骨灰龕位申請（每月 1 日至月底）', tip: '如選擇綠色殯葬或私營持牌骨灰安置所，此項可點選「不適用」。' },
+          { id: 'f4_2', text: '（如選綠色殯葬）申請食環署免費紀念花園撒灰、免費海上撒灰及「無盡思念」網上追思', tip: '不收費，亦可透過 greenburial.gov.hk 辦理。' },
+          { id: 'f4_3', text: '通知銀行、保險公司、強積金 (MPF)、水電煤、電訊及公屋／房委會辦理戶口凍結或終止', tip: '注意：持久授權書 (EPA) 於當事人離世一刻即自動失效，不可再動用聯名以外之個人戶口。' }
+        ]
+      },
+      {
+        stageId: 'st5',
+        title: '階段五：第 2 至 6 個月（遺產承辦與善後）',
+        items: [
+          { id: 'f5_1', text: '向高等法院「遺產承辦處」申請《遺囑認證》（有平安紙）或《遺產管理書》（無平安紙）', tip: '如遺產僅為不超過 HK$50,000 之現金／銀行存款且無其他資產，可向民政事務總署申請「確認通知書」。' },
+          { id: 'f5_2', text: '向民政事務總署申請「支用銀行存款證明書」（如急需提取死者戶口支付殮葬費）', tip: '毋須先等待遺產承辦書完成，如無需要可點選「不適用」。' },
+          { id: 'f5_3', text: '照顧在世家人情緒與哀傷輔導（需要時聯絡贐明會、善寧會、東華三院或社福熱線）', tip: '照顧好自己，才是對先人最好的報答。' }
+        ]
+      }
+    ];
+
+    /* ---------------------------------------------------------
+       5. 駐港領事館與兩岸支援機構 (官方核實資料)
+       --------------------------------------------------------- */
+    const CONSULATES_DATA = [
+      { flag: '🇹🇼', name: '台北經濟文化辦事處（香港辦事處）', tel: '24 小時急難救助：6143 9012 / 9314 0130（一般查詢：2887 5011）', addr: '香港灣仔港灣道 18 號中環廣場 49 樓 4907 室', web: 'https://www.teco-hk.org', note: '供台灣民眾在港遭遇重大急難救助及文件驗證諮詢。' },
+      { flag: '🇨🇳', name: '內地旅客及在港內地人士緊急求助參考', tel: '警方／救護：999（普通話支援）｜旅遊業監管局：3698 5900｜旅發局：2508 1234', addr: '各區香港警署報案室及公立醫院急症室', web: 'https://www.tia.org.hk', note: '遇緊急意外先致電 999 並聯絡旅遊保險 24 小時熱線；遺失證件請先向警方報失並聯絡中旅社／官方渠道查詢。' },
+      { flag: '🇮🇩', name: '印尼駐港總領事館 (KJRI Hong Kong)', tel: '3651 0200（緊急救助專線見官網）', addr: '銅鑼灣敬誠街 6–8 號', web: 'https://kemlu.go.id/hongkong', note: '為在港印尼籍外傭 (PMI) 及旅客提供護照、勞工及突發事故協助。' },
+      { flag: '🇵🇭', name: '菲律賓駐港總領事館 (Philippine Consulate General)', tel: '2823 8500（ATN 緊急專線見官網）', addr: '金鐘統一中心 14 樓', web: 'https://hongkongpcg.dfa.gov.ph', note: '設有 Assistance-to-Nationals (ATN) 及 MWO 支援在港菲律賓外傭 (OFW)。' },
+      { flag: '🇹🇭', name: '泰國駐港總領事館 (Royal Thai Consulate-General)', tel: '2521 6481', addr: '金鐘紅棉路 8 號東昌大廈 8 樓', web: 'https://hongkong.thaiembassy.org', note: '協助在港泰國僑民、外傭及旅客處理緊急事故。' },
+      { flag: '🇯🇵', name: '日本國駐香港總領事館', tel: '2522 1184（24 小時緊急對應）', addr: '中環交易廣場第一座 46–47 樓', web: 'https://www.hk.emb-japan.go.jp', note: '邦人援護（日本國民在港急病、事故、遺失護照等援助）。' },
+      { flag: '🇰🇷', name: '大韓民國駐香港總領事館', tel: '2529 4141（緊急見官網）', addr: '金鐘夏慤道 16 號遠東金融中心 5 樓', web: 'https://overseas.mofa.go.kr/hk-ko', note: '為在港韓國公民及旅客提供領事緊急協助。' },
+      { flag: '🤝', name: '外勞事工中心 / HELP for Domestic Workers (NGO)', tel: '2522 8264 / 2523 4020', addr: '中環花園道聖約翰座堂 / 灣仔', web: 'https://www.migrants.net', note: '免費及保密權益諮詢，協助外傭及家屬解決勞資、工傷及突發困難。' }
+    ];
+
+    /* ---------------------------------------------------------
+       6. 平安三寶 2026 互動問答題庫 (10 題)
+       --------------------------------------------------------- */
+    const QUIZ_DATA = [
+      {
+        q: '1. 2026 年 7 月 31 日正式生效的香港新法例，將「平安三寶」中哪一項提升至明確法定地位？',
+        opts: ['平安紙（遺囑）', '預設醫療指示（AMD）及不作心肺復甦術命令（DNACPR）', '公眾龕位租約'],
+        ans: 1,
+        exp: '《維持生命治療的預作決定條例》（第 651 章）於 2026 年 7 月 31 日正式生效，確立預設醫療指示（AMD）及 DNACPR 的法定效力，保障醫護及救護員依法尊重病人意願。',
+        summary: '易明一句話：2026 年 7 月底起，預設醫療指示正式有明確法律保障！'
+      },
+      {
+        q: '2. 長者在紙本《安心交帶手冊》寫好「把存款捐給某慈善機構」並簽名，這份手冊有遺囑法律效力嗎？',
+        opts: ['有，只要本人親筆簽名同寫日期就得', '沒有！必須依足法例訂立正式「平安紙（遺囑）」方具法律效力', '只要有社工在場就有法律效力'],
+        ans: 1,
+        exp: '交帶手冊只是方便家人了解心願的參考索引，絕不等同遺囑。正式平安紙須由具精神行為能力的立遺囑人在兩名非受益人見證下簽署。',
+        summary: '易明一句話：交帶手冊無法律效力，分配或捐贈遺產一定要立正式平安紙。'
+      },
+      {
+        q: '3. 2026 新例訂立「預設醫療指示 (AMD)」時，見證人有什麼法定要求？',
+        opts: ['任何一位親友見證即可', '須有兩名見證人，其中最少一名必須為香港註冊醫生，且兩名見證人均不得對訂立人遺產有利益關係', '毋須見證人，網上打剔即可'],
+        ans: 1,
+        exp: '法例採「慎入易出」原則：訂立時須由最少兩名見證人見證（其一須為註冊醫生並確信訂立人具備精神能力），見證人不可是遺產受益人。',
+        summary: '易明一句話：立醫療指示要「慎入」——兩名無利益見證人（含一名醫生）。'
+      },
+      {
+        q: '4. 立了「預設醫療指示」後，如果長者日後改變主意想撤銷，手續複雜嗎？',
+        opts: ['非常複雜，要上高等法院申請', '「易出」：只要具備精神行為能力，隨時可用口頭、書面或銷毀正本方式撤銷', '一旦簽了終身不可更改'],
+        ans: 1,
+        exp: '2026 新例強調「慎入易出」，立指示時嚴謹，但當事人只要仍清醒，隨時可輕易口頭、書面、撕毀或經醫健通撤銷，保障生命自主權。',
+        summary: '易明一句話：想改主意隨時得，口頭或書面都可以即刻撤銷！'
+      },
+      {
+        q: '5. 「持久授權書 (EPA)」在授權人不幸離世後，受權人還可以用它去銀行提款辦後事嗎？',
+        opts: ['可以，一直有效直到遺產分完', '不可以！授權人離世一刻，持久授權書即自動失效', '可以提最多 10 萬元'],
+        ans: 1,
+        exp: '持久授權書只適用於授權人「在生但失去精神行為能力」期間。一旦離世，授權即時終止，切勿再動用死者戶口，否則可能觸犯法例。',
+        summary: '易明一句話：持久授權書「管生不管死」，離世一刻自動失效！'
+      },
+      {
+        q: '6. 如果長者單身獨居、沒有立平安紙，離世後又沒有任何親人認領剩餘遺產，最後會點處理？',
+        opts: ['自動分給鄰居或看護', '依法由遺產管理官處理並公告，5 年後若仍無人認領，扣除費用後撥歸香港政府庫房作無主財物', '自動捐給最近醫院'],
+        ans: 1,
+        exp: '根據《無遺囑者遺產條例》，沒有合資格繼承人且無人認領的遺產，經法定程序及公告 5 年後歸政府。若長者想將餘款捐予特定慈善機構，務必預先立正式平安紙。',
+        summary: '易明一句話：單身想將餘產捐慈善，一定要寫入正式平安紙，否則 5 年後歸政府。'
+      },
+      {
+        q: '7. 2026 年起，為了方便公私營醫生及救護員緊急時查閱，預設醫療指示可以怎樣保存？',
+        opts: ['只能鎖進銀行保險箱', '除保存實體正本外，可經註冊醫生核實上載至「醫健通 (eHealth)」作電子確效文本', '貼在屋企大門外'],
+        ans: 1,
+        exp: '2026 新制配合醫健通電子平台，經註冊醫生核實上載的紀錄具確效地位，同時建議家屬保存清晰正本以便救護員核實 DNACPR。',
+        summary: '易明一句話：正本妥善放易見處＋上載「醫健通」最安心。'
+      },
+      {
+        q: '8. 有人在醫院門口主動遞卡片，聲稱「畀 $8,000 可以幫你即時打尖攞公眾龕位，保證抽中」，應該怎樣做？',
+        opts: ['立即轉賬搶名額', '立即拒絕！這是典型騙案，2026 年 8 月起食環署已改為每月公開免費編配公眾龕位，絕無內部打尖名額', '先付一半訂金試試'],
+        ans: 1,
+        exp: '所有食環署公眾骨灰龕位均公開免費抽籤，不存在收費插隊。遇可疑推銷可致電警方防騙易 18222 查詢。',
+        summary: '易明一句話：公眾龕位絕無「收錢打尖」，聲稱包中必是騙局！'
+      },
+      {
+        q: '9. 如果家人長期在海外工作或因天災戰亂未能即時返港，長者離世後的骨灰可以點安頓？',
+        opts: ['必須即時買幾十萬私營龕位', '可由在港協調人或已登記合法慈善機構協助簡單火化，並向食環署申請每月 HK$80 官方骨灰暫存（FEHB 251）', '不能火化，只能無限期停屍'],
+        ans: 1,
+        exp: '食環署提供廉宜的官方骨灰暫存服務（首 2 個月免費，其後每月 HK$80），可先妥善安頓骨灰，等海外家人日後平安回港再從容處理。',
+        summary: '易明一句話：海外返唔切唔使慌，食環署每月 $80 骨灰暫存幫你過渡！'
+      },
+      {
+        q: '10. 在香港，透過食環署申請「紀念花園撒灰」或「海上撒灰」（綠色殯葬），政府收取多少費用？',
+        opts: ['免費（HK$0），並可免費登記《綠色殯葬中央登記名冊》', '需要 $15,000', '只限綜援人士免費'],
+        ans: 0,
+        exp: '食環署的紀念花園撒灰、免費渡輪海上撒灰，以及「無盡思念」網上追思專頁均完全免費，所有香港市民均可生前預先登記意願。',
+        summary: '易明一句話：政府綠色殯葬同網上追思完全免費，環保又有尊嚴！'
+      }
+    ];
+
+    /* ---------------------------------------------------------
+       7. 防騙查冊、宗教團體、合法慈善代理 (V1.2 全數覆核修正版)
+       --------------------------------------------------------- */
+    const DIRECTORY_DATA = [
+      { cat: 'gov', name: '食環署持牌殮葬商公開名冊（10 秒查冊）', tel: '2868 0000（龕位編配：2841 9111）', deaf: '電郵：enquiries@fehd.gov.hk', web: 'https://www.fehd.gov.hk/tc_chi/cc/lu.pdf', desc: '付訂前務必查核商戶是否持有效牌照，並可於官網查閱 2026 每月公眾龕位編配及骨灰暫存 (FEHB 251)。' },
+      { cat: 'gov', name: '稅務局《稅務條例》第 88 條免稅慈善機構名單', tel: '187 8088', deaf: '網上即時查冊（毋須致電）', web: 'https://www.ird.gov.hk/chi/tax/ach_index.htm', desc: '防騙必查！核實任何聲稱「慈善代理身後事」或募捐團體是否屬香港合法免稅慈善機構。' },
+      { cat: 'gov', name: '私營骨灰安置所事務辦事處（持牌私營龕場查冊）', tel: '3142 2300', deaf: '網上即時查核正式牌照名單', web: 'https://www.rpc.gov.hk', desc: '切勿購買無牌或聲稱「已入紙申請一定批」之私營骨灰龕位，務必先在此查冊。' },
+      { cat: 'gov', name: '警方「防騙易 18222」及「防騙視伏器」', tel: '18222（24 小時）', deaf: '網上視伏器／手機 App 即時輸入電話、網址或 FPS 查證', web: 'https://cyberdefender.hk/scameter/', desc: '遇上可疑殯儀中介、催促轉賬至個人戶口或聲稱包中龕位，立即查證。' },
+      { cat: 'charity', name: '東華三院「圓滿人生服務」', tel: '2657 7899（後事諮詢）／ 2884 2033（活得自在）', deaf: 'WhatsApp 聊天機械人：2884 2033｜傳真：2657 9300｜電郵：ecs-lifex@tungwah.org.hk', web: 'https://ecs.tungwahcsd.org', desc: '合法註冊慈善機構，提供免費後事程序諮詢、無依獨居長者生前規劃與後事執行（須生前登記評估）。' },
+      { cat: 'charity', name: '聖雅各福群會「後顧無憂」規劃服務', tel: '2831 3230（無憂通每日電聯：2117 5854）', deaf: '傳真：3104 3640｜居家寧養 WhatsApp：4633 8553', web: 'https://www.sjs.org.hk', desc: '專為獨居／雙老及缺乏支援長者提供生前身後事託付規劃與每日報平安關顧。' },
+      { cat: 'charity', name: '榕光社「夕陽之友」免費殯葬計劃', tel: '2763 9944', deaf: '傳真：2763 9934｜電郵：info@banyanservice.org', web: 'https://banyanservice.org', desc: '協助獨居、無依及清貧離世長者有尊嚴走完最後一程，避免無人認領（須經核實或社工轉介）。' },
+      { cat: 'charity', name: '善寧會／賽馬會善寧之家', tel: '2331 7000', deaf: '傳真：2336 2776｜電郵：sphc@hospicecare.org.hk', web: 'https://www.hospicecare.org.hk', desc: '提供寧養紓緩照顧、家屬哀傷輔導及預設照顧規劃教育。' },
+      { cat: 'charity', name: '贐明會（喪親哀傷及臨終關懷）', tel: '2361 6606', deaf: 'WhatsApp 查詢：5721 8354｜傳真：2361 6294｜電郵：cccg@cccg.org.hk', web: 'https://www.cccg.org.hk', desc: '提供免費或低收費喪親哀傷輔導、臨終關懷及殯儀支援諮詢。' },
+      { cat: 'religion', name: '香港佛教聯合會', tel: '2574 9371（香港佛教墳場：2556 3216）', deaf: '傳真：2834 0789｜電郵：enquiry@hkbuddhist.org', web: 'https://www.hkbuddhist.org', desc: '查詢香港佛教墳場、正規佛教儀軌指引及核實道場資訊，防範假冒推銷。' },
+      { cat: 'religion', name: '香港道教聯合會', tel: '2396 4881', deaf: '傳真：2391 2001｜電郵：admin@hktaoist.org.hk', web: 'https://www.hktaoist.org.hk', desc: '查證正統道教喪禮儀軌及合法宮觀資訊，避免墮入天價法事陷阱。' },
+      { cat: 'religion', name: '天主教香港教區墳場辦事處', tel: '長沙灣：2741 5283｜柴灣：2557 4213｜跑馬地：2572 6078', deaf: '電郵：ccemstraphael@catholic.org.hk / ccemholycross@catholic.org.hk', web: 'https://cemeteries.catholic.org.hk', desc: '查詢教友殯葬禮儀、天主教墳場及骨灰龕位官方申請手續。' },
+      { cat: 'religion', name: '香港華人基督教聯會（墓園部）', tel: '2337 4171（薄扶林：2817 1821｜九龍：2336 0653）', deaf: '傳真：2338 2314｜電郵：info@hkcccu.org.hk', web: 'https://www.hkcccu.org.hk', desc: '查詢聯會香港／九龍基督教墳場、骨庫及教會安息禮拜指引。' },
+      { cat: 'religion', name: '香港回教信託基金總會（伊斯蘭教）', tel: '2893 1051 / 2838 9417（墳場管理處：2575 2967）', deaf: '傳真：2891 9559｜電郵：trustees@netvigator.com', web: 'https://www.islamictrusthk.org', desc: '協助香港穆斯林社群（含印傭及少數族裔）辦理符合教規之土葬及殯葬程序。' },
+      { cat: 'deaf', name: '香港聾人福利促進會（聽障支援）', tel: '2527 8969（輔導中心：2711 1974）', deaf: '傳真：2529 3316｜電郵：headoffice@deaf.org.hk｜各區中心設專屬 WhatsApp', web: 'https://www.deaf.org.hk', desc: '提供手語傳譯轉介及社工支援，協助聽障長者或家屬處理醫療及重要事務。' },
+      { cat: 'deaf', name: '香港盲人輔導會（視障支援）', tel: '2778 8332', deaf: '無障礙語音及社工支援', web: 'https://www.hksb.org.hk', desc: '為視障及失明人士提供資訊無障礙協助及社區輔導。' }
+    ];
+
+    const VEHICLE_CHECKS = [
+      { id: 'v1', text: '核對車行是否持有運輸署有效「非專營巴士（客運營業證 PSL）」或合法靈車牌照' },
+      { id: 'v2', text: '書面列明總車費，確認已包含隧道費、橋費、停車場費及司機津貼（防尾數加價）' },
+      { id: 'v3', text: '列明「超時等候費」計算標準（例如火葬場或法事延誤每小時收費）' },
+      { id: 'v4', text: '確認是否需要「無障礙低地台／輪椅升降台」或提前預約香港復康會易達巴士' },
+      { id: 'v5', text: '確認出發前取消或因八號風球／黑雨改期之免費更改政策' },
+      { id: 'v6', text: '確認出發點、殯儀館、火葬場及解穢酒回程下車點之完整路線與斜路附加費' },
+      { id: 'v7', text: '保留正式公司抬頭收據，切勿轉賬至來歷不明之私人銀行戶口' },
+      { id: 'v8', text: '出發前 24 小時獲取司機姓名、手提電話及車牌號碼並同步到家人群組' }
+    ];
+
+    const NICHE_CHECKS = [
+      { id: 'n1', text: '已取得食環署發出之《領取骨灰許可證》或合法火化證明文件' },
+      { id: 'n2', text: '確認先人符合香港居民或食環署公眾龕位申請資格（合葬多一位先人可多一張抽籤紙）' },
+      { id: 'n3', text: '已決定選擇標準龕位 ($2,490)／大型龕位 ($3,090)、禁香區或非禁香區' },
+      { id: 'n4', text: '如輪候期間需要安放，已辦理食環署骨灰暫存 (FEHB 251，每月 HK$80)' },
+      { id: 'n5', text: '已下載本頁 .ics 日曆提醒，於每月 1 日至月底透過食環署官方網站免費申請' }
+    ];
+
+    /* ---------------------------------------------------------
+       8. 初始化與全域安全事件委派 (徹底根除引號報錯)
+       --------------------------------------------------------- */
+    window.onload = function () {
+      // 安全綁定靜態朗讀按鈕
+      document.getElementById('btn-read-banner').addEventListener('click', () => {
+        speakText(document.getElementById('ui-banner-title').innerText + ' ' + document.getElementById('ui-banner-text').innerText);
+      });
+      document.getElementById('btn-read-legal').addEventListener('click', () => {
+        speakText(document.getElementById('ui-elder-legal-title').innerText + '。' + document.getElementById('ui-elder-legal-body').innerText);
+      });
+      document.getElementById('btn-read-deaf').addEventListener('click', () => {
+        speakText(document.getElementById('deaf-giant-display').innerText);
+      });
+
+      // 全域事件委派：處理所有動態生成的朗讀按鈕與快捷提問按鈕
+      document.addEventListener('click', function (e) {
+        const spkBtn = e.target.closest('[data-speak-id]');
+        if (spkBtn) {
+          const text = speakRegistry.get(spkBtn.dataset.speakId) || '';
+          if (text) speakText(text);
+          return;
+        }
+        const promptBtn = e.target.closest('[data-prompt-idx]');
+        if (promptBtn) {
+          const idx = Number(promptBtn.dataset.promptIdx);
+          const list = I18N[currentLang].aiPrompts || [];
+          if (list[idx]) {
+            document.getElementById('ai-user-input').value = list[idx];
+            sendAiMessage();
+          }
+          return;
+        }
+        const presetBtn = e.target.closest('[data-preset-idx]');
+        if (presetBtn) {
+          const idx = Number(presetBtn.dataset.presetIdx);
+          const list = I18N[currentLang].deafPresets || [];
+          if (list[idx]) {
+            document.getElementById('deaf-giant-display').innerText = list[idx];
+          }
+        }
+      });
+
+      renderElderForm();
+      renderFamilyChecklist();
+      renderNicheCalendar();
+      renderQuiz();
+      renderDirectory();
+      renderVehicleChecklist();
+      applyLanguageUI();
+      initAiChat();
+      updateFontButtons('base');
+    };
+
+    function switchTab(tabName) {
+      const tabs = ['elder', 'family', 'helper', 'ai', 'niche', 'quiz', 'directory', 'festival'];
+      tabs.forEach(t => {
+        const panel = document.getElementById('panel-' + t);
+        const btn = document.getElementById('tab-' + t);
+        if (panel) panel.classList.toggle('hidden', t !== tabName);
+        if (btn) btn.classList.toggle('active', t === tabName);
+      });
+      document.getElementById('floating-ai-btn').classList.toggle('hidden', tabName === 'ai');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ---------------------------------------------------------
+       9. 長者《安心交帶手冊》互動邏輯 (多選 + 不適用互斥)
+       --------------------------------------------------------- */
+    function renderElderForm() {
+      const container = document.getElementById('elder-form-container');
+      container.innerHTML = '';
+
+      ELDER_SCHEMA.forEach(section => {
+        const secEl = document.createElement('div');
+        secEl.className = 'card p-4 sm:p-5 space-y-4';
+        const spkId = registerSpeakText(section.title + '。' + section.desc);
+
+        let html = `
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-2.5" style="border-color: var(--border-color);">
+            <div>
+              <h3 class="font-extrabold text-lg sm:text-xl">${section.title}</h3>
+              <p class="text-sm opacity-80 mt-0.5">${section.desc}</p>
+            </div>
+            <button type="button" data-speak-id="${spkId}"
+              class="min-h-[42px] px-3 rounded-xl border-2 font-bold text-sm"
+              style="border-color: var(--border-color); background-color: var(--bg-soft);">
+              🔊 朗讀本段
+            </button>
+          </div>
+          <div class="space-y-4">
+        `;
+
+        section.fields.forEach(field => {
+          if (field.type === 'multi' || field.type === 'single') {
+            const currentVal = elderData.selections[field.id] || [];
+            const badge = field.type === 'multi'
+              ? '<span class="text-xs px-2 py-0.5 rounded-full font-bold ml-1" style="background-color: var(--accent-soft); color: var(--text-main);">可多項剔取</span>'
+              : '<span class="text-xs px-2 py-0.5 rounded-full font-bold ml-1" style="background-color: var(--bg-soft);">單項選擇</span>';
+
+            html += `
+              <div class="space-y-2">
+                <div class="font-bold text-base">${field.label} ${badge}</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            `;
+
+            field.options.forEach((opt, idx) => {
+              const isSelected = currentVal.includes(opt);
+              html += `
+                <button type="button" onclick="toggleElderOption('${field.id}', '${field.type}', ${idx}, false)"
+                  class="option-tile ${isSelected ? 'selected' : ''}">
+                  <span class="big-check-box">${isSelected ? '✓' : ''}</span>
+                  <span class="font-medium leading-snug">${opt}</span>
+                </button>
+              `;
+            });
+
+            if (field.hasNA) {
+              const isNA = currentVal.includes('__NA__');
+              html += `
+                <button type="button" onclick="toggleElderOption('${field.id}', '${field.type}', -1, true)"
+                  class="option-tile ${isNA ? 'na-selected' : ''}">
+                  <span class="big-check-box">${isNA ? '—' : ''}</span>
+                  <span class="font-bold leading-snug">${field.naLabel || '不適用 (N/A)'}</span>
+                </button>
+              `;
+            }
+
+            html += `</div></div>`;
+          } else if (field.type === 'text' || field.type === 'textarea') {
+            const val = elderData.texts[field.id] || '';
+            const inputId = 'ef-' + field.id;
+            html += `
+              <div class="space-y-1.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <label for="${inputId}" class="font-bold text-base">${field.label}</label>
+                  <div class="flex gap-1.5">
+                    <button type="button" onclick="setElderTextNA('${field.id}', '${inputId}')"
+                      class="min-h-[38px] px-2.5 rounded-lg border font-bold text-xs"
+                      style="border-color: var(--border-color); background-color: var(--bg-soft);">
+                      填「不適用」
+                    </button>
+                    <button type="button" onclick="startDictation('${inputId}', this)"
+                      class="min-h-[38px] px-2.5 rounded-lg border font-bold text-xs"
+                      style="border-color: var(--accent); background-color: var(--accent-soft); color: var(--text-main);">
+                      🎤 講字輸入
+                    </button>
+                  </div>
+                </div>
+                ${field.type === 'textarea'
+                  ? `<textarea id="${inputId}" rows="3" oninput="updateElderText('${field.id}', this.value)" placeholder="${escapeAttr(field.placeholder)}"
+                      class="w-full p-3.5 rounded-xl border-2 text-base"
+                      style="background-color: var(--bg-main); border-color: var(--border-color); color: var(--text-main);">${escapeHtml(val)}</textarea>`
+                  : `<input id="${inputId}" type="text" value="${escapeAttr(val)}" oninput="updateElderText('${field.id}', this.value)" placeholder="${escapeAttr(field.placeholder)}"
+                      class="w-full min-h-[52px] px-3.5 rounded-xl border-2 text-base"
+                      style="background-color: var(--bg-main); border-color: var(--border-color); color: var(--text-main);" />`
+                }
+              </div>
+            `;
+          }
+        });
+
+        html += `</div>`;
+        secEl.innerHTML = html;
+        container.appendChild(secEl);
+      });
+    }
+
+    function toggleElderOption(fieldId, fieldType, optIndex, isNA) {
+      let fieldObj = null;
+      ELDER_SCHEMA.forEach(s => s.fields.forEach(f => { if (f.id === fieldId) fieldObj = f; }));
+      if (!fieldObj) return;
+
+      let arr = Array.isArray(elderData.selections[fieldId]) ? [...elderData.selections[fieldId]] : [];
+
+      if (isNA) {
+        arr = arr.includes('__NA__') ? [] : ['__NA__'];
+      } else {
+        const optText = fieldObj.options[optIndex];
+        arr = arr.filter(x => x !== '__NA__');
+        if (fieldType === 'single') {
+          arr = arr.includes(optText) ? [] : [optText];
+        } else {
+          if (arr.includes(optText)) {
+            arr = arr.filter(x => x !== optText);
+          } else {
+            arr.push(optText);
+          }
+        }
+      }
+
+      elderData.selections[fieldId] = arr;
+      safeSave(STORAGE_KEY_ELDER, elderData);
+      renderElderForm();
+    }
+
+    function updateElderText(fieldId, value) {
+      elderData.texts[fieldId] = value;
+      safeSave(STORAGE_KEY_ELDER, elderData);
+    }
+
+    function setElderTextNA(fieldId, inputId) {
+      const el = document.getElementById(inputId);
+      if (el) {
+        el.value = '不適用 (N/A)';
+        updateElderText(fieldId, el.value);
+        showToast('已填入「不適用 (N/A)」');
+      }
+    }
+
+    /* ---------------------------------------------------------
+       10. 家屬 5 階段清單 (三態：未辦 / 已完成 / 不適用)
+       --------------------------------------------------------- */
+    function renderFamilyChecklist() {
+      const container = document.getElementById('family-stages-container');
+      container.innerHTML = '';
+
+      let totalItems = 0, doneCount = 0, naCount = 0;
+
+      FAMILY_STAGES.forEach(stage => {
+        const card = document.createElement('div');
+        card.className = 'card p-4 sm:p-5 space-y-3';
+        let html = `<h3 class="font-extrabold text-lg sm:text-xl border-b pb-2" style="border-color: var(--border-color);">${stage.title}</h3><div class="space-y-3">`;
+
+        stage.items.forEach(item => {
+          totalItems++;
+          const st = familyData.statuses[item.id] || 'todo';
+          if (st === 'done') doneCount++;
+          if (st === 'na') naCount++;
+
+          const rowOpacity = st === 'na' ? 'opacity-65' : '';
+          const textDecor = st === 'done' ? 'line-through opacity-80' : '';
+
+          html += `
+            <div class="soft-box p-3.5 space-y-2.5 ${rowOpacity}">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div class="flex-1">
+                  <div class="font-bold text-base ${textDecor}">${item.text}</div>
+                  <div class="text-sm opacity-80 mt-1">💡 ${item.tip}</div>
+                </div>
+                <div class="flex flex-wrap gap-2 shrink-0">
+                  <button type="button" onclick="setFamilyStatus('${item.id}', '${st === 'done' ? 'todo' : 'done'}')"
+                    class="tri-btn-done ${st === 'done' ? 'is-active' : ''} min-h-[48px] px-4 rounded-xl border-2 font-bold text-sm transition">
+                    ${st === 'done' ? '✓ 已完成' : '☐ 標記完成'}
+                  </button>
+                  <button type="button" onclick="setFamilyStatus('${item.id}', '${st === 'na' ? 'todo' : 'na'}')"
+                    class="tri-btn-na ${st === 'na' ? 'is-active' : ''} min-h-[48px] px-3.5 rounded-xl border-2 font-bold text-sm transition">
+                    ${st === 'na' ? '— 已選不適用' : '不適用 (N/A)'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        html += `</div>`;
+        card.innerHTML = html;
+        container.appendChild(card);
+      });
+
+      const applicable = totalItems - naCount;
+      const pct = applicable > 0 ? Math.round((doneCount / applicable) * 100) : 100;
+      document.getElementById('family-progress-text').innerText = `已完成 ${doneCount} / ${applicable} 項適用步驟 (${pct}%)`;
+      document.getElementById('family-na-badge').innerText = `不適用：${naCount} 項`;
+      document.getElementById('family-progress-bar').style.width = pct + '%';
+
+      const notesEl = document.getElementById('family-notes');
+      if (notesEl && notesEl.value !== (familyData.notes || '')) {
+        notesEl.value = familyData.notes || '';
+      }
+    }
+
+    function setFamilyStatus(itemId, status) {
+      familyData.statuses[itemId] = status;
+      safeSave(STORAGE_KEY_FAMILY, familyData);
+      renderFamilyChecklist();
+    }
+
+    function saveFamilyNotes(val) {
+      familyData.notes = val;
+      safeSave(STORAGE_KEY_FAMILY, familyData);
+    }
+
+    function copyFamilyProgress() {
+      let lines = ['【安心後事通｜家人辦理進度同步報告】', `更新時間：${new Date().toLocaleString('zh-HK')}`, ''];
+      FAMILY_STAGES.forEach(stage => {
+        lines.push(`■ ${stage.title}`);
+        stage.items.forEach(item => {
+          const st = familyData.statuses[item.id] || 'todo';
+          const mark = st === 'done' ? '[✓ 已完成]' : (st === 'na' ? '[— 不適用]' : '[☐ 待辦]');
+          lines.push(`  ${mark} ${item.text}`);
+        });
+        lines.push('');
+      });
+      if (familyData.notes && familyData.notes.trim()) {
+        lines.push('■ 其他／補充事項：');
+        lines.push(familyData.notes.trim());
+      }
+      copyTextToClipboard(lines.join('\n'), '已複製純文字進度報告！可直接貼到家庭 WhatsApp 群組。');
+    }
+
+    /* ---------------------------------------------------------
+       11. 外傭與訪港旅客緊急頁渲染 (V1.2 全 9 種語言同步切換)
+       --------------------------------------------------------- */
+    function renderHelperEmergency() {
+      const t = I18N[currentLang];
+
+      const hGrid = document.getElementById('helper-hotlines-grid');
+      hGrid.innerHTML = (t.hotlines || I18N['zh-HK'].hotlines).map(h => `
+        <div class="card p-4 space-y-1">
+          <div class="text-2xl">${h.icon}</div>
+          <div class="font-bold text-sm opacity-85">${h.name}</div>
+          <div class="text-2xl font-black tracking-wide" style="color: var(--accent);">${h.num}</div>
+          <div class="text-xs opacity-80">${h.note}</div>
+        </div>
+      `).join('');
+
+      const sGrid = document.getElementById('helper-scenarios-grid');
+      sGrid.innerHTML = (t.scenarios || I18N['zh-HK'].scenarios).map(sc => `
+        <div class="card p-4 sm:p-5 space-y-2.5">
+          <h3 class="font-extrabold text-lg">${sc.title}</h3>
+          <ul class="space-y-2 text-sm sm:text-base">
+            ${sc.points.map(p => `<li class="soft-box p-3">${p}</li>`).join('')}
+          </ul>
+        </div>
+      `).join('');
+
+      const cList = document.getElementById('consulate-list');
+      cList.innerHTML = CONSULATES_DATA.map(c => `
+        <div class="soft-box p-3.5 space-y-1">
+          <div class="font-extrabold text-base">${c.flag} ${c.name}</div>
+          <div class="text-sm">📞 <strong>${c.tel}</strong></div>
+          <div class="text-sm">📍 ${c.addr}</div>
+          <div class="text-xs opacity-80">${c.note}</div>
+          <a href="${c.web}" target="_blank" rel="noopener" class="inline-block text-sm font-bold underline mt-1" style="color: var(--accent);">Official Website ↗</a>
+        </div>
+      `).join('');
+    }
+
+    function openEmergencyFlashcard() {
+      openDeafModal();
+      const presets = I18N[currentLang].deafPresets;
+      if (presets && presets.length) {
+        const sosText = (currentLang === 'zh-HK') ? presets[3] : (presets[1] && (currentLang === 'zh-CN' || currentLang === 'zh-TW' || currentLang === 'en') ? presets[1] : presets[0]);
+        document.getElementById('deaf-giant-display').innerText = sosText;
+      }
+    }
+
+    /* ---------------------------------------------------------
+       12. 2026 食環署公眾龕位每月編配日曆 (V1.2 新增本月截止倒數)
+       --------------------------------------------------------- */
+    function renderNicheCalendar() {
+      const now = new Date();
+      const curY = now.getFullYear();
+      const curM = now.getMonth(); // 0..11
+
+      // 本月最後一日 17:00
+      const endOfCurMonth = new Date(curY, curM + 1, 0, 17, 0, 0);
+      const msLeftCur = endOfCurMonth - now;
+      const curDeadlineEl = document.getElementById('niche-current-deadline');
+      const curEndDateEl = document.getElementById('niche-current-end-date');
+
+      if (msLeftCur > 0) {
+        const daysLeft = Math.floor(msLeftCur / (1000 * 60 * 60 * 24));
+        const hrsLeft = Math.floor((msLeftCur % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        curDeadlineEl.innerText = daysLeft > 0 ? `尚餘 ${daysLeft} 日 ${hrsLeft} 小時` : `最後 ${hrsLeft} 小時！`;
+      } else {
+        curDeadlineEl.innerText = '本月已截止';
+      }
+      curEndDateEl.innerText = `${curY} 年 ${curM + 1} 月 ${endOfCurMonth.getDate()} 日 17:00 截止`;
+
+      // 下個月 1 號 09:00
+      let nextYear = curY;
+      let nextMonth = curM + 1;
+      if (nextMonth > 11) {
+        nextMonth = 0;
+        nextYear++;
+      }
+      const nextOpen = new Date(nextYear, nextMonth, 1, 9, 0, 0);
+      const diffNextDays = Math.max(0, Math.ceil((nextOpen - now) / (1000 * 60 * 60 * 24)));
+
+      document.getElementById('niche-next-window').innerText = `${nextYear} 年 ${nextMonth + 1} 月 1 日`;
+      document.getElementById('niche-countdown').innerText = `距離下輪開放尚餘 ${diffNextDays} 日 (09:00 開始)`;
+
+      const container = document.getElementById('niche-checklist-container');
+      container.innerHTML = NICHE_CHECKS.map(item => {
+        const st = nicheData[item.id] || 'todo';
+        return `
+          <div class="soft-box p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${st === 'na' ? 'opacity-65' : ''}">
+            <span class="font-medium ${st === 'done' ? 'line-through' : ''}">${item.text}</span>
+            <div class="flex gap-2 shrink-0">
+              <button type="button" onclick="setSimpleTriState('niche', '${item.id}', '${st === 'done' ? 'todo' : 'done'}')"
+                class="tri-btn-done ${st === 'done' ? 'is-active' : ''} min-h-[42px] px-3 rounded-xl border-2 font-bold text-xs">
+                ${st === 'done' ? '✓ 已備妥' : '☐ 已備妥'}
+              </button>
+              <button type="button" onclick="setSimpleTriState('niche', '${item.id}', '${st === 'na' ? 'todo' : 'na'}')"
+                class="tri-btn-na ${st === 'na' ? 'is-active' : ''} min-h-[42px] px-3 rounded-xl border-2 font-bold text-xs">
+                ${st === 'na' ? '— 不適用' : '不適用'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function downloadNicheICS() {
+      const now = new Date();
+      let y = now.getFullYear();
+      let m = now.getMonth() + 2;
+      if (m > 12) { m = 1; y++; }
+      const mm = String(m).padStart(2, '0');
+      const dtStart = `${y}${mm}01T090000`;
+      const dtEnd = `${y}${mm}01T100000`;
+      const icsContent = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//HK Afterlife Guide//FEHD Monthly Niche Reminder//ZH',
+        'BEGIN:VEVENT',
+        `UID:fehd-niche-${y}${mm}@hkafterlifeguide`,
+        `DTSTART:${dtStart}`,
+        `DTEND:${dtEnd}`,
+        'RRULE:FREQ=MONTHLY;COUNT=6',
+        'SUMMARY:食環署公眾骨灰龕位每月編配查閱提醒',
+        'DESCRIPTION:每月1日上午9時至月底下午5時接受申請。請前往食環署官方網站 fehd.gov.hk 免費查閱及遞交申請（絕勿經收費中介）。',
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n');
+
+      const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `FEHD_Niche_Reminder_${y}_${mm}.ics`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('已下載每月日曆提醒 (.ics)，點擊檔案即可匯入手機日曆！');
+    }
+
+    /* ---------------------------------------------------------
+       13. 平安三寶 2026 互動問答邏輯 (修復高對比答錯色彩 & 安全朗讀)
+       --------------------------------------------------------- */
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      document.getElementById('quiz-total').innerText = QUIZ_DATA.length;
+      let score = 0;
+
+      container.innerHTML = QUIZ_DATA.map((item, qIdx) => {
+        const chosen = quizAnswered[qIdx];
+        const isCorrect = chosen === item.ans;
+        if (isCorrect) score++;
+        const qSpkId = registerSpeakText(item.q);
+        const expSpkId = registerSpeakText(item.exp + ' ' + item.summary);
+
+        return `
+          <div class="card p-4 sm:p-5 space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="font-extrabold text-base sm:text-lg">${item.q}</h3>
+              <button type="button" data-speak-id="${qSpkId}" class="min-h-[40px] px-3 rounded-xl border-2 font-bold text-xs shrink-0"
+                style="border-color: var(--border-color); background-color: var(--bg-soft);">🔊 朗讀</button>
+            </div>
+            <div class="space-y-2">
+              ${item.opts.map((opt, oIdx) => {
+                let extraClass = '';
+                if (chosen !== undefined) {
+                  if (oIdx === item.ans) extraClass = 'selected';
+                  else if (oIdx === chosen && oIdx !== item.ans) extraClass = 'wrong-selected';
+                }
+                return `
+                  <button type="button" onclick="answerQuiz(${qIdx}, ${oIdx})" class="option-tile w-full ${extraClass}">
+                    <span class="big-check-box">${chosen === oIdx ? (oIdx === item.ans ? '✓' : '✕') : (chosen !== undefined && oIdx === item.ans ? '✓' : '')}</span>
+                    <span class="font-medium">${opt}</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+            ${chosen !== undefined ? `
+              <div class="${isCorrect ? 'soft-box' : 'warn-box'} p-3.5 text-sm space-y-1.5">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="font-extrabold">${isCorrect ? '✅ 答啱咗！' : '💡 唔緊要，一齊睇正確法例：'}</div>
+                  <button type="button" data-speak-id="${expSpkId}" class="px-2.5 py-1 rounded-lg border font-bold text-xs"
+                    style="border-color: var(--border-color); background-color: var(--bg-card); color: var(--text-main);">🔊 朗讀解析</button>
+                </div>
+                <p>${item.exp}</p>
+                <p class="font-bold pt-1">👉 ${item.summary}</p>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('quiz-score').innerText = score;
+    }
+
+    function answerQuiz(qIdx, oIdx) {
+      quizAnswered[qIdx] = oIdx;
+      renderQuiz();
+    }
+
+    /* ---------------------------------------------------------
+       14. 防騙名錄 & 租車 8 點核對 (高對比安全變數)
+       --------------------------------------------------------- */
+    function renderDirectory() {
+      const q = (document.getElementById('dir-search').value || '').trim().toLowerCase();
+      const cat = document.getElementById('dir-cat').value;
+
+      const filtered = DIRECTORY_DATA.filter(d => {
+        const matchCat = cat === 'all' || d.cat === cat;
+        const matchQ = !q || (d.name + d.desc + d.deaf + d.tel).toLowerCase().includes(q);
+        return matchCat && matchQ;
+      });
+
+      const list = document.getElementById('directory-list');
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="soft-box p-4 text-center opacity-75 col-span-full">找不到符合關鍵字的機構，請嘗試其他字詞。</div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(d => `
+        <div class="soft-box p-4 space-y-1.5 flex flex-col justify-between">
+          <div class="space-y-1">
+            <div class="font-extrabold text-base">${d.name}</div>
+            <p class="text-sm opacity-85">${d.desc}</p>
+            <div class="text-sm">📞 電話：<strong>${d.tel}</strong></div>
+            <div class="text-sm font-semibold" style="color: var(--accent);">👂 聽障友善非電話渠道：${d.deaf}</div>
+          </div>
+          <div class="pt-2">
+            <a href="${d.web}" target="_blank" rel="noopener" class="text-sm font-bold underline" style="color: var(--accent);">官方網站核實 ↗</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderVehicleChecklist() {
+      const container = document.getElementById('vehicle-checklist-container');
+      container.innerHTML = VEHICLE_CHECKS.map(item => {
+        const st = vehicleData[item.id] || 'todo';
+        return `
+          <div class="soft-box p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${st === 'na' ? 'opacity-65' : ''}">
+            <span class="font-medium ${st === 'done' ? 'line-through' : ''}">${item.text}</span>
+            <div class="flex gap-2 shrink-0">
+              <button type="button" onclick="setSimpleTriState('vehicle', '${item.id}', '${st === 'done' ? 'todo' : 'done'}')"
+                class="tri-btn-done ${st === 'done' ? 'is-active' : ''} min-h-[44px] px-3.5 rounded-xl border-2 font-bold text-xs">
+                ${st === 'done' ? '✓ 已核實' : '☐ 核實'}
+              </button>
+              <button type="button" onclick="setSimpleTriState('vehicle', '${item.id}', '${st === 'na' ? 'todo' : 'na'}')"
+                class="tri-btn-na ${st === 'na' ? 'is-active' : ''} min-h-[44px] px-3 rounded-xl border-2 font-bold text-xs">
+                ${st === 'na' ? '— 不適用' : '不適用 (N/A)'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setSimpleTriState(target, id, state) {
+      if (target === 'vehicle') {
+        vehicleData[id] = state;
+        safeSave(STORAGE_KEY_VEHICLE, vehicleData);
+        renderVehicleChecklist();
+      } else if (target === 'niche') {
+        nicheData[id] = state;
+        safeSave(STORAGE_KEY_NICHE, nicheData);
+        renderNicheCalendar();
+      }
+    }
+
+    function copyVehicleChecklist() {
+      const lines = ['【出殯旅遊巴／靈車問價 8 點防坑清單】'];
+      VEHICLE_CHECKS.forEach((item, i) => {
+        const st = vehicleData[item.id] || 'todo';
+        const mark = st === 'done' ? '[✓ 已核實]' : (st === 'na' ? '[— 不適用]' : '[☐ 待確認]');
+        lines.push(`${i + 1}. ${mark} ${item.text}`);
+      });
+      copyTextToClipboard(lines.join('\n'), '已複製出殯租車 8 點防坑核對清單！');
+    }
+
+    /* ---------------------------------------------------------
+       15. AI 安心解說員 (9 語安全零成本離線知識庫 + 可選雲端代理)
+       --------------------------------------------------------- */
+    // 若日後透過免費 Cloudflare Worker 接駁實時 AI，只須填入安全代理網址；留空則全程零成本使用 9 語核實知識庫
+    const OPTIONAL_AI_PROXY_URL = '';
+
+    function initAiChat() {
+      const t = I18N[currentLang];
+      const log = document.getElementById('ai-chat-log');
+      log.innerHTML = '';
+      appendAiBubble('model', t.aiWelcome);
+      renderAiQuickPrompts();
+    }
+
+    function renderAiQuickPrompts() {
+      const t = I18N[currentLang];
+      const box = document.getElementById('ai-quick-prompts');
+      box.innerHTML = (t.aiPrompts || []).map((p, idx) => `
+        <button type="button" data-prompt-idx="${idx}"
+          class="min-h-[42px] px-3 py-1.5 rounded-xl border-2 text-sm font-semibold text-left"
+          style="border-color: var(--accent); background-color: var(--bg-card); color: var(--text-main);">
+          💬 ${escapeHtml(p)}
+        </button>
+      `).join('');
+    }
+
+    function toggleAiRoleExplain() {
+      document.getElementById('ai-role-box').classList.toggle('hidden');
+    }
+
+    function appendAiBubble(role, text) {
+      const log = document.getElementById('ai-chat-log');
+      const div = document.createElement('div');
+      div.className = role === 'user' ? 'flex justify-end' : 'flex justify-start';
+
+      const safeText = escapeHtml(text).replace(/\n/g, '<br>');
+      if (role === 'user') {
+        div.innerHTML = `<div class="ai-user-bubble max-w-[85%] p-3.5 rounded-2xl font-medium">${safeText}</div>`;
+      } else {
+        const spkId = registerSpeakText(text);
+        div.innerHTML = `
+          <div class="max-w-[92%] p-3.5 rounded-2xl border-2 space-y-2" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <div class="flex items-center justify-between gap-2 text-xs font-bold opacity-80">
+              <span>🤖 AI 安心解說員</span>
+              <button type="button" data-speak-id="${spkId}" class="px-2.5 py-0.5 rounded border font-bold" style="border-color: var(--border-color);">🔊 ${I18N[currentLang].readAloud}</button>
+            </div>
+            <div class="text-sm sm:text-base leading-relaxed">${safeText}</div>
+          </div>
+        `;
+      }
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    async function sendAiMessage() {
+      const input = document.getElementById('ai-user-input');
+      const sendBtn = document.getElementById('ai-send-btn');
+      const userText = (input.value || '').trim();
+      if (!userText) return;
+
+      input.value = '';
+      appendAiBubble('user', userText);
+
+      const log = document.getElementById('ai-chat-log');
+      const loadingDiv = document.createElement('div');
+      loadingDiv.id = 'ai-loading-bubble';
+      loadingDiv.className = 'text-sm font-bold opacity-75 p-2';
+      loadingDiv.innerText = '🤖 ...';
+      log.appendChild(loadingDiv);
+      log.scrollTop = log.scrollHeight;
+      sendBtn.disabled = true;
+
+      try {
+        let reply = '';
+        if (OPTIONAL_AI_PROXY_URL) {
+          reply = await callProxyAi(userText);
+        } else {
+          // 零費用公開部署預設：快速以 9 國語言核實知識庫回應（0 成本、0 外洩、即時響應）
+          await new Promise(r => setTimeout(r, 320));
+          reply = smartLocalKnowledgeAnswer(userText, currentLang);
+        }
+        loadingDiv.remove();
+        appendAiBubble('model', reply);
+      } catch (err) {
+        loadingDiv.remove();
+        appendAiBubble('model', smartLocalKnowledgeAnswer(userText, currentLang));
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+
+    async function callProxyAi(userQuery) {
+      aiChatHistory.push({ role: 'user', parts: [{ text: userQuery }] });
+      const res = await fetch(OPTIONAL_AI_PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lang: currentLang, history: aiChatHistory.slice(-6) })
+      });
+      if (!res.ok) throw new Error('Proxy HTTP ' + res.status);
+      const data = await res.json();
+      const text = data.reply || data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error('Empty reply');
+      aiChatHistory.push({ role: 'model', parts: [{ text }] });
+      return text;
+    }
+
+    function smartLocalKnowledgeAnswer(q, lang) {
+      const low = q.toLowerCase();
+
+      // 1. 外傭 / 旅客 / 領事館 / 台灣 / 內地急難
+      if (/外傭|工人|helper|ofw|pmi|majikan|amo|แม่บ้าน|旅客|tourist|visitor|wisatawan|turista|旅行|여행|นักท่องเที่ยว|領事|consulate|kjri|台灣|台北|内地|內地|999/.test(low)) {
+        if (lang === 'en') {
+          return '【HK Emergency & Repatriation Guide】\n1. Dial 999 immediately for Police/Ambulance (24/7 English & multi-language interpretation).\n2. Foreign Domestic Helpers (FDH): Under HK\'s Standard Employment Contract, if a helper passes away during employment, the employer is legally responsible for the cost of repatriating the remains and personal belongings. Call HK Labour Dept 24h FDH Hotline: 2157 9537.\n3. Tourists: Contact your Travel Insurance 24h hotline and your Consulate General in HK first before paying commercial deposits.\n4. Anti-Scam: Consulates NEVER ask for personal WhatsApp transfers. (Information only; not formal legal advice.)';
+        }
+        if (lang === 'id') {
+          return '【Panduan Resmi Darurat HK】\n1. Hubungi 999 segera untuk Polisi/Ambulans.\n2. Hak PMI: Berdasarkan Kontrak Kerja Standar HK, jika PMI meninggal saat masa kontrak, majikan wajib menanggung biaya pemulangan jenazah & barang pribadi ke Indonesia.\n3. Kontak Resmi: KJRI Hong Kong (3651 0200) & Hotline PMI Depnaker HK 24 Jam (2157 9537).\n4. Waspada Penipuan: Jangan pernah transfer ke rekening pribadi lewat WhatsApp. (Hanya informasi umum.)';
+        }
+        if (lang === 'tl') {
+          return '【Opisyal na Gabay sa Emergency sa HK】\n1. Tumawag agad sa 999 para sa Pulis o Ambulansya.\n2. Karapatan ng OFW: Sa Standard Employment Contract, kung pumanaw ang domestic helper habang nasa kontrata, obligasyon ng amo ang gastos sa pagpapauwi ng labi at gamit sa Pilipinas.\n3. Opisyal na Kontak: Philippine Consulate General HK (2823 8500) at HK Labour Dept 24h Hotline (2157 9537).\n4. Iwas-Scam: Huwag magpadala ng pera sa personal na account sa WhatsApp. (Para sa gabay lamang.)';
+        }
+        if (lang === 'ja') {
+          return '【香港緊急対応ガイド】\n1. まず 999（警察・救急）へ通報してください。\n2. 在香港日本国総領事館（2522 1184・24時間緊急対応）および海外旅行保険24時間デスクへ直接ご連絡ください。\n3. ご家族がすぐ渡航できない場合、香港で火葬後に食環署（FEHD）の公式一時保管（月80香港ドル・FEHB 251）を利用できます。\n4. 領事館が個人口座への振込を求めることは絶対にありません。（一般的な情報提供であり、法的助言ではありません。）';
+        }
+        if (lang === 'ko') {
+          return '【홍콩 긴급 대처 안내】\n1. 즉시 999(경찰·구급)로 신고하세요.\n2. 주홍콩 대한민국 총영사관(2529 4141)과 해외여행자보험 24시간 긴급지원센터에 먼저 연락하시기 바랍니다.\n3. 가족이 당장 입국하기 어려운 경우, 화장 후 홍콩 식품환경위생서(FEHD) 공식 유골 임시 보관(월 HK$80, FEHB 251)을 이용할 수 있습니다.\n4. 영사관이나 홍콩 당국은 절대 메신저로 개인 계좌 송금을 요구하지 않습니다.';
+        }
+        if (lang === 'th') {
+          return '【คู่มือฉุกเฉินในฮ่องกง】\n1. โทร 999 ทันทีเพื่อแจ้งตำรวจหรือรถพยาบาล\n2. แรงงานแม่บ้านไทย: ตามสัญญาจ้างมาตรฐาน หากเสียชีวิตระหว่างสัญญา นายจ้างต้องรับผิดชอบค่าส่งศพและทรัพย์สินกลับไทย ติดต่อสายด่วนแรงงานฮ่องกง 2157 9537\n3. สถานกงสุลใหญ่ไทย ณ เมืองฮ่องกง: 2521 6481 และติดต่อสายด่วน 24 ชม. ของประกันการเดินทาง\n4. เตือนภัย: อย่าโอนเงินให้บัญชีส่วนตัวทาง WhatsApp';
+        }
+        if (lang === 'zh-TW') {
+          return '【台灣旅客與外傭在港急難指引】\n1. 立即撥打香港 999 報案／救護（支援國語）。\n2. 台灣鄉親請即聯繫「台北經濟文化辦事處（香港）」24 小時急難救助專線：(852) 6143 9012 或 9314 0130，同時通知台灣旅平險 24 小時海外支援中心。\n3. 若為在港外傭於合約期內身故，香港法定由僱主承擔遺體及個人物品運返原居地之費用（勞工處 24 小時專線：2157 9537）。\n4. 家人若一時趕不到香港，可先火化並向食環署申請每月 HK$80 骨灰暫存（FEHB 251）。（僅供資訊參考，非正式法律意見）';
+        }
+        if (lang === 'zh-CN') {
+          return '【内地访港旅客及外佣应急指引】\n1. 遇严重意外请立即拨打 999（支持普通话）送往公立医院，并先联系旅游保险 24 小时救援热线。\n2. 香港旅游业监管局：3698 5900；旅发局：2508 1234；警方防骗易：18222。\n3. 若家属暂时无法赴港，可先委托持牌机构办理简办火化，并向香港食环署申请官方骨灰暂存（每月 80 港币，表格 FEHB 251），待日后方便来港再领取。\n4. 切勿向陌生微信或个人账户转账。（仅供参考，不构成正式法律意见）';
+        }
+        return '【留港外傭及旅客緊急指引】\n1. 緊急求助請即致電 999（24 小時免費，支援多語言翻譯）。\n2. 外籍家庭傭工（工人姐姐）：按香港標準僱傭合約，若於合約期內不幸身故，僱主有法定責任承擔遺體及個人物品運返原居地之費用；勞工處外傭 24 小時熱線：2157 9537。\n3. 訪港旅客：請先聯絡旅遊保險 24 小時熱線及所屬駐港總領事館（台灣急難救助 6143 9012；內地旅客可致電 999 普通話支援及旅監局 3698 5900）。\n4. 切勿向陌生 WhatsApp 個人戶口轉賬。（僅供一般資訊參考，非正式法律意見）';
+      }
+
+      // 2. 平安三寶 2026 / AMD / EPA / 遺產
+      if (/平安三寶|平安三宝|醫療指示|医疗指示|預立醫療|2026|amd|epa|651|持久授權|遺囑|遗嘱|平安紙|遺產|遗产|advance medical|will|directive/.test(low)) {
+        if (lang === 'en') {
+          return '【HK 2026 "Three Peace-of-Mind Documents"】\n1. Advance Medical Directive (AMD): Cap. 651 took effect on 31 July 2026 ("cautious in, easy out"). Requires 2 disinterested witnesses (at least 1 registered HK doctor) and can be uploaded to eHealth.\n2. Enduring Power of Attorney (EPA): Manages finances while alive but mentally incapacitated; automatically terminates upon death. Must be witnessed by a doctor and HK solicitor (within 28 days) and registered at the High Court.\n3. Will: Takes effect after death. Note that the Elder Handover Booklet has NO legal effect; leaving residual estate to charity requires a formal Will (otherwise unclaimed estate goes to the HK Government after 5 years). (Educational only.)';
+        }
+        return '【香港 2026「平安三寶」重點】\n1. 預設醫療指示 (AMD)：《維持生命治療的預作決定條例》（第 651 章）已於 2026 年 7 月 31 日正式生效，採「慎入易出」原則——須由 2 名無遺產利益見證人（其中 1 名為香港註冊醫生）見證，並可經醫生核實上載至「醫健通 (eHealth)」；清醒時隨時可口頭或書面撤銷。\n2. 持久授權書 (EPA)：處理在生失智時之財務，須由醫生及香港律師（28 日內）見證並向高院註冊；留意當事人離世一刻 EPA 即自動失效！\n3. 平安紙（遺囑）：離世後生效。長者《交帶手冊》絕無法律效力；單身長者如欲將剩餘遺產捐予合法慈善機構，必須訂立正式平安紙，否則無遺囑且無人認領經遺產管理官公告 5 年後歸香港政府。（本回覆只供參考，不構成法律或醫療意見）';
+      }
+
+      // 3. 海外失聯 / 獨居代理 / 骨灰暫存 / 綠色殯葬 / 龕位
+      if (/海外|獨居|独居|代理|骨灰|暫存|暂存|綠色殯葬|绿色殡葬|龕位|龛位|塔位|遺骨|유골|อัฐิ|ash|niche|fehd|storage/.test(low)) {
+        if (lang === 'en') {
+          return '【Overseas Family Contingency, Ash Storage & Monthly Niche】\n1. FEHD Official Ash Storage: First 2 months free after cremation, then HK$80/month (Form FEHB 251, Kwai Chung / Wo Hop Shek). Ideal if overseas relatives cannot fly to HK immediately.\n2. 2026 Monthly Public Niche Allocation: Effective 1 Aug 2026, FEHD opens applications from 1st (9 AM) to month-end (5 PM) every month (Standard HK$2,490 / Large HK$3,090). Free public ballot—never pay agents!\n3. Free Green Burial: Garden of Remembrance or sea scattering + "Internet Memorial Service" are 100% free (Register via Form FEHB 278 / greenburial.gov.hk).';
+        }
+        return '【海外失聯代理、骨灰暫存與 2026 每月龕位】\n1. 獨居代理須生前登記：合法慈善機構（如東華三院 2884 2033、聖雅各福群會 2831 3230、榕光社 2763 9944）須生前正式登記評估方能代辦後事。\n2. 食環署官方骨灰暫存：火化後首 2 個月免費，其後只需 HK$80/月（表格 FEHB 251），非常適合海外家人遇天災或工作暫未能回港時作過渡。\n3. 2026 年 8 月起公眾龕位每月編配：每月 1 日上午 9 時至月底下午 5 時接受網上免費申請（涵蓋和合石第六期、哥連臣角新廈、石門、曾咀；標準 $2,490／大型 $3,090）。\n4. 逾時終極備案：可免費登記食環署《綠色殯葬中央登記名冊》(FEHB 278)，完全免費。（本回覆只供資訊參考）';
+      }
+
+      // 4. 防騙 / 查冊 / 宗教 / 慈善機構
+      if (/防騙|防骗|防詐|受騙|查冊|查册|殮葬|殡仪|葬儀|慈善|scam|verify|charity|penipuan|มิจฉาชีพ|사기|詐欺/.test(low)) {
+        if (lang === 'en') {
+          return '【10-Second HK Anti-Scam Verification】\n1. Licensed Undertakers: Check FEHD official list (fehd.gov.hk / Tel 2868 0000). Always demand itemized written quotations.\n2. Legal Charities: Verify Section 88 tax-exempt status on IRD website (ird.gov.hk/chi/tax/ach_index.htm).\n3. Private Niches: Check valid licence at Private Columbaria Affairs Office (rpc.gov.hk).\n4. Suspected Scam: Call HK Police Anti-Scam Helpline 18222 or check Scameter (cyberdefender.hk/scameter/).';
+        }
+        return '【香港善終 10 秒防騙核實步驟】\n1. 查持牌殮葬商：登入食環署網站查核《持牌殮葬商名單》（熱線 2868 0000），堅持要書面分項報價，拒絕醫院走廊兜客。\n2. 查合法慈善機構：登入稅務局《稅務條例》第 88 條認可慈善名單（ird.gov.hk）核實真偽，絕不轉賬至陌生個人戶口。\n3. 查私營龕場牌照：登入私營骨灰安置所事務辦事處（rpc.gov.hk）核實是否持有效正式牌照；公眾龕位絕無「收錢打尖」。\n4. 即時驗騙案：致電警方 24 小時防騙易 18222 或用「防騙視伏器」(cyberdefender.hk/scameter/)。';
+      }
+
+      // 預設總覽導航回覆
+      if (lang === 'en') {
+        return 'Thank you for asking! You can ask me about:\n• 2026 HK Advance Medical Directive (Cap. 651) & Will / EPA\n• Overseas family ash storage (HK$80/mo) & Monthly Public Niche ballot\n• Domestic Helper (FDH) & Tourist emergency steps (999, Consulates, Repatriation)\n• 10-second Anti-Scam verification (FEHD, IRD Sec. 88, Police 18222)\n(This platform is 100% zero-profit; information is for reference only.)';
+      }
+      return '多謝你的提問！你可以點選上方快捷問題，或者直接輸入關鍵字查詢以下香港 2026 核實資訊：\n• 「平安三寶」2026 年 7 月新例（預設醫療指示 AMD、持久授權書、平安紙及單身遺產）\n• 「海外家人未回港／獨居代理」、食環署每月 $80 骨灰暫存與 2026 每月龕位編配\n• 「外傭（工人姐姐）／旅客」在港突發意外、999 求助及駐港領事館聯絡\n• 「防騙查冊」（食環署持牌殮葬商、稅務局第 88 條合法慈善名單、防騙易 18222）\n（本回覆僅供公益資訊參考，不構成正式法律或醫療意見）';
+    }
+
+    /* ---------------------------------------------------------
+       16. A4 特大字列印引擎 (10mm x 10mm 粗黑方格，無重覆欄位)
+       --------------------------------------------------------- */
+    function printElderBooklet() {
+      const printArea = document.getElementById('print-area');
+      let html = `
+        <div style="text-align:center; margin-bottom:5mm;">
+          <h1 style="font-size:20pt; font-weight:900; margin:0;">我的安心交帶手冊（長者大字版）</h1>
+          <p style="font-size:11pt; margin:2mm 0 0 0;">安心後事通 HK Afterlife Guide V1.2｜零盈利公益單張｜方格尺寸 10mm x 10mm 方便手寫打剔</p>
+        </div>
+        <div class="print-legal-banner">
+          <strong style="font-size:14pt;">⚠️ 重要法律效力聲明：本手冊沒有法律效力</strong><br/>
+          本手冊只用作生前記錄個人心願與文件位置，方便家人或合法代理跟進。<strong>它絕不等同平安紙（遺囑）、持久授權書或預設醫療指示。</strong>若與正式法律文件有任何抵觸，一切以正式法律文件為準，避免爭拗。切勿在此寫下任何銀行密碼。
+        </div>
+      `;
+
+      ELDER_SCHEMA.forEach(sec => {
+        html += `<div class="print-section"><h2 style="font-size:15pt; font-weight:900; margin:0 0 3mm 0;">${sec.title}</h2>`;
+        sec.fields.forEach(f => {
+          if (f.printInSignBox) return; // 交由底部專屬核實簽署欄統一列印，避免重覆
+          if (f.type === 'multi' || f.type === 'single') {
+            const vals = elderData.selections[f.id] || [];
+            html += `<div style="margin-bottom:3.5mm;"><div style="font-weight:700; margin-bottom:2mm;">${f.label} ${f.type === 'multi' ? '（可多項剔取）' : '（單選）'}</div>`;
+            f.options.forEach(opt => {
+              const checked = vals.includes(opt);
+              html += `<div style="margin-bottom:2mm; display:flex; align-items:center;"><span class="print-box-10mm">${checked ? '✓' : ''}</span><span>${opt}</span></div>`;
+            });
+            if (f.hasNA) {
+              const isNA = vals.includes('__NA__');
+              html += `<div style="margin-bottom:2mm; display:flex; align-items:center;"><span class="print-box-10mm">${isNA ? '—' : ''}</span><span><strong>${f.naLabel || '不適用 (N/A)'}</strong></span></div>`;
+            }
+            html += `</div>`;
+          } else {
+            const val = elderData.texts[f.id] || '';
+            html += `<div style="margin-bottom:3.5mm;"><div style="font-weight:700;">${f.label}：</div><div class="print-write-line">${escapeHtml(val) || '&nbsp;'}</div></div>`;
+          }
+        });
+        html += `</div>`;
+      });
+
+      const savedSigner = escapeHtml(elderData.texts['sign_name'] || '');
+      const savedDate = escapeHtml(elderData.texts['sign_date'] || '');
+      html += `
+        <div class="print-section">
+          <h2 style="font-size:14pt; font-weight:900; margin:0 0 2mm 0;">填寫人核實簽署／指模欄（僅確認為本人最新心願紀錄，絕無遺囑法律效力）</h2>
+          <p style="margin:2.5mm 0;">填寫人／協助代筆人姓名：${savedSigner || '____________________________'}</p>
+          <p style="margin:2.5mm 0;">本人親筆簽署（手部不便可由協助人朗讀並按指模／畫押）：____________________________</p>
+          <p style="margin:2.5mm 0;">填寫／檢視日期：${savedDate || '20____ 年 ____ 月 ____ 日'}</p>
+        </div>
+      `;
+
+      printArea.innerHTML = html;
+      window.print();
+    }
+
+    function printFamilyChecklist() {
+      const printArea = document.getElementById('print-area');
+      let html = `
+        <div style="text-align:center; margin-bottom:5mm;">
+          <h1 style="font-size:20pt; font-weight:900; margin:0;">香港家人辦理身後事步驟程序清單（2026 版）</h1>
+          <p style="font-size:11pt; margin:2mm 0 0 0;">每項均設「完成」及「不適用」10mm 手寫方格｜安心後事通 V1.2 零盈利公益版</p>
+        </div>
+      `;
+
+      FAMILY_STAGES.forEach(st => {
+        html += `<div class="print-section"><h2 style="font-size:14pt; font-weight:900; margin:0 0 3mm 0;">${st.title}</h2>`;
+        st.items.forEach(item => {
+          const val = familyData.statuses[item.id] || 'todo';
+          html += `
+            <div style="margin-bottom:3mm; display:flex; align-items:flex-start; gap:3mm; border-bottom:1px dashed #999; padding-bottom:2mm;">
+              <div style="white-space:nowrap;">
+                <span class="print-box-10mm">${val === 'done' ? '✓' : ''}</span><span style="font-size:10pt; margin-right:3mm;">完成</span>
+                <span class="print-box-10mm">${val === 'na' ? '—' : ''}</span><span style="font-size:10pt;">不適用</span>
+              </div>
+              <div>
+                <div style="font-weight:700;">${item.text}</div>
+                <div style="font-size:10pt; color:#333;">提示：${item.tip}</div>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      });
+
+      html += `
+        <div class="print-section">
+          <h2 style="font-size:14pt; font-weight:900; margin:0 0 2mm 0;">第六部分：其他／補充事項（家屬備忘與分工）</h2>
+          <div class="print-write-line">${escapeHtml(familyData.notes || '') || '&nbsp;'}</div>
+          <div class="print-write-line">&nbsp;</div>
+          <div class="print-write-line">&nbsp;</div>
+        </div>
+      `;
+
+      printArea.innerHTML = html;
+      window.print();
+    }
+
+    /* ---------------------------------------------------------
+       17. 多語言切換、無障礙控制、語音輸入／朗讀、QR、Modal
+       --------------------------------------------------------- */
+    function setLanguage(lang) {
+      currentLang = I18N[lang] ? lang : 'zh-HK';
+      applyLanguageUI();
+      initAiChat();
+      showToast(document.getElementById('lang-select').selectedOptions[0].text);
+    }
+
+    function applyLanguageUI() {
+      const t = I18N[currentLang];
+      document.documentElement.lang = currentLang;
+      document.getElementById('ui-app-title').innerText = t.appTitle;
+      document.getElementById('ui-app-subtitle').innerText = t.appSubtitle;
+      document.getElementById('ui-contrast-label').innerText = t.contrast;
+      document.getElementById('ui-deaf-btn').innerText = t.deafBtn;
+      document.getElementById('ui-qr-btn').innerText = t.qrBtn;
+      document.getElementById('ui-rate-label').innerText = speechRate === 0.75 ? t.rateSlow : t.rateNormal;
+      document.getElementById('ui-fab-ai').innerText = t.fabAi;
+      document.getElementById('ui-ai-send-lbl').innerText = t.aiSend;
+      document.getElementById('ai-user-input').placeholder = t.aiPlaceholder;
+      document.getElementById('ui-banner-title').innerText = t.bannerTitle;
+      document.getElementById('ui-banner-text').innerText = t.bannerText;
+
+      document.querySelectorAll('.ui-read-aloud').forEach(el => { el.innerText = t.readAloud; });
+
+      Object.keys(t.nav).forEach(k => {
+        const el = document.getElementById('nav-' + k + '-lbl');
+        if (el) el.innerText = t.nav[k];
+      });
+
+      document.getElementById('ui-helper-title').innerText = t.helperTitle;
+      document.getElementById('ui-helper-subtitle').innerText = t.helperSubtitle;
+      document.getElementById('ui-btn-show-card').innerText = t.btnShowCard;
+      document.getElementById('ui-consulate-title').innerText = t.consulateTitle;
+      document.getElementById('ui-helper-antiscam').innerText = t.helperAntiScam;
+      document.getElementById('ui-ai-title').innerText = t.aiTitle;
+      document.getElementById('ui-ai-desc').innerText = t.aiDesc;
+
+      // 重新渲染外傭及旅客緊急頁（套用新語言）
+      renderHelperEmergency();
+
+      // 更新聽障預設句與初始大字板
+      const presetGrid = document.getElementById('deaf-preset-grid');
+      if (presetGrid && t.deafPresets) {
+        document.getElementById('deaf-giant-display').innerText = t.deafPresets[0];
+        presetGrid.innerHTML = t.deafPresets.map((p, idx) => `
+          <button type="button" data-preset-idx="${idx}"
+            class="soft-box p-3 text-left font-bold text-sm hover:opacity-90">
+            ${escapeHtml(p)}
+          </button>
+        `).join('');
+      }
+    }
+
+    function setFontSize(level) {
+      document.body.classList.remove('font-lg', 'font-xl');
+      if (level === 'lg') document.body.classList.add('font-lg');
+      if (level === 'xl') document.body.classList.add('font-xl');
+      updateFontButtons(level);
+    }
+
+    function updateFontButtons(active) {
+      ['base', 'lg', 'xl'].forEach(lvl => {
+        const btn = document.getElementById('btn-font-' + lvl);
+        if (!btn) return;
+        btn.style.backgroundColor = lvl === active ? 'var(--accent)' : 'var(--bg-soft)';
+        btn.style.color = lvl === active ? 'var(--btn-active-text)' : 'var(--text-main)';
+      });
+    }
+
+    function toggleContrast() {
+      document.body.classList.toggle('high-contrast');
+      const activeFont = document.body.classList.contains('font-xl') ? 'xl' : (document.body.classList.contains('font-lg') ? 'lg' : 'base');
+      updateFontButtons(activeFont);
+    }
+
+    function toggleSpeechRate() {
+      speechRate = speechRate === 0.75 ? 1.0 : 0.75;
+      const t = I18N[currentLang];
+      document.getElementById('ui-rate-label').innerText = speechRate === 0.75 ? t.rateSlow : t.rateNormal;
+      showToast(`🔊 ${speechRate}x`);
+    }
+
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) {
+        showToast('此瀏覽器暫不支援語音朗讀功能。');
+        return;
+      }
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = I18N[currentLang].speechLang || 'zh-HK';
+        utter.rate = speechRate;
+        window.speechSynthesis.speak(utter);
+        showToast(`🔊 正在朗讀 (${speechRate}x)...`);
+      } catch (e) {
+        showToast('語音朗讀啟動失敗，請檢查裝置音量設定。');
+      }
+    }
+
+    function startDictation(targetInputId, btnEl) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        showToast('此瀏覽器暫不支援即時語音輸入，請使用手機鍵盤麥克風或直接打字。');
+        return;
+      }
+      try {
+        const rec = new SpeechRec();
+        rec.lang = I18N[currentLang].speechLang || 'zh-HK';
+        rec.interimResults = false;
+        rec.maxAlternatives = 1;
+
+        if (btnEl) btnEl.classList.add('recording-pulse');
+        showToast('🎤 請開始說話...');
+
+        rec.onresult = function (e) {
+          const transcript = e.results[0][0].transcript;
+          const el = document.getElementById(targetInputId);
+          if (el) {
+            el.value = el.value ? (el.value + ' ' + transcript) : transcript;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+          showToast('✅ 已完成語音轉文字！');
+        };
+        rec.onerror = function () {
+          showToast('未能辨識語音，請確認已允許麥克風權限並再試一次。');
+        };
+        rec.onend = function () {
+          if (btnEl) btnEl.classList.remove('recording-pulse');
+        };
+        rec.start();
+      } catch (e) {
+        if (btnEl) btnEl.classList.remove('recording-pulse');
+        showToast('無法啟動麥克風語音輸入。');
+      }
+    }
+
+    function openDeafModal() {
+      document.getElementById('deaf-modal').classList.remove('hidden');
+    }
+
+    function openQrModal() {
+      const modal = document.getElementById('qr-modal');
+      modal.classList.remove('hidden');
+      const url = window.location.href.startsWith('http') ? window.location.href : 'https://hk-afterlife-guide.pages.dev';
+      document.getElementById('qr-url-preview').innerText = url;
+
+      const box = document.getElementById('qrcode-box');
+      box.innerHTML = '';
+      try {
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(box, { text: url, width: 200, height: 200, colorDark: '#000000', colorLight: '#ffffff' });
+        } else {
+          box.innerHTML = '<div class="p-6 text-sm font-bold text-black">QR 模組離線中，請按下方複製連結分享。</div>';
+        }
+      } catch (e) {
+        box.innerHTML = '<div class="p-6 text-sm font-bold text-black">請按下方按鈕複製連結分享。</div>';
+      }
+    }
+
+    function copyShareUrl() {
+      const url = document.getElementById('qr-url-preview').innerText;
+      copyTextToClipboard(`【安心後事通 HK Afterlife Guide】免費香港善終防騙與長者手冊工具：${url}`, '已複製分享連結！可直接貼到 WhatsApp。');
+    }
+
+    function requestClearData(target) {
+      pendingClearTarget = target;
+      document.getElementById('confirm-modal-msg').innerText =
+        target === 'elder'
+          ? '確定清除本機已填寫的《長者安心交帶手冊》全部內容？建議先按「A4 特大字列印」留底。'
+          : '確定重設《家屬 5 階段清單》所有剔選及備忘紀錄？';
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function executeConfirmedClear() {
+      if (pendingClearTarget === 'elder') {
+        elderData = { selections: {}, texts: {} };
+        safeSave(STORAGE_KEY_ELDER, elderData);
+        renderElderForm();
+        showToast('已清除長者手冊紀錄。');
+      } else if (pendingClearTarget === 'family') {
+        familyData = { statuses: {}, notes: '' };
+        safeSave(STORAGE_KEY_FAMILY, familyData);
+        renderFamilyChecklist();
+        showToast('已重設家屬辦理清單。');
+      }
+      pendingClearTarget = null;
+      closeModal('confirm-modal');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    /* ---------------------------------------------------------
+       18. 工具函式 (雙重剪貼簿支援、吐司、HTML 轉義)
+       --------------------------------------------------------- */
+    function copyTextToClipboard(text, successMsg) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text)
+          .then(() => showToast(successMsg || '已複製到剪貼簿！'))
+          .catch(() => fallbackCopy(text, successMsg));
+      } else {
+        fallbackCopy(text, successMsg);
+      }
+    }
+
+    function fallbackCopy(text, successMsg) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast(successMsg || '已複製到剪貼簿！');
+      } catch (e) {
+        showToast('複製失敗，請手動選取文字複製。');
+      }
+    }
+
+    function showToast(msg) {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = 'px-4 py-2.5 rounded-xl shadow-lg font-bold text-sm text-white pointer-events-auto';
+      el.style.backgroundColor = '#0F172A';
+      el.innerText = msg;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 3200);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/'/g, '&#39;').replace(/\n/g, ' ');
+    }
+  </script>
+</body>
+</html>
