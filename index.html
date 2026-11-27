@@ -5,6 +5,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>安心後事通 HK Afterlife Guide V1.2 — 香港免費善終與防騙公益平台</title>
+  <!-- PWA App 規格連線設定 -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0F766E" />
+  <link rel="apple-touch-icon" href="icon-512.png" />
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- QR Code Generator Library -->
@@ -306,7 +310,7 @@
        ========================================================= -->
   <div id="app-shell" class="min-h-screen flex flex-col">
 
-    <!-- 1. 頂部無障礙與 9 種語言控制列 (已修復標籤對稱結構) -->
+    <!-- 1. 頂部無障礙與 9 種語言控制列 -->
     <header class="sticky top-0 z-40 shadow-md border-b-2" style="background-color: var(--bg-card); border-color: var(--border-color);">
       <div class="max-w-6xl mx-auto px-3 py-2.5">
         <div class="flex flex-wrap items-center justify-between gap-2.5">
@@ -629,7 +633,7 @@
             </button>
           </div>
 
-          <!-- 動態倒數看板 (V1.2 新增本月截止倒數 + 下月開放日期) -->
+          <!-- 動態倒數看板 -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div class="soft-box p-4 text-center">
               <div class="text-sm font-bold opacity-80">本月批次截止倒數</div>
@@ -722,7 +726,7 @@
       </section>
 
       <!-- =====================================================
-           TAB 7: 防騙查冊、宗教團體、合法慈善代理 & 租車防坑 (全部號碼已覆核)
+           TAB 7: 防騙查冊、宗教團體、合法慈善代理 & 租車防坑
            ===================================================== -->
       <section id="panel-directory" class="hidden space-y-5">
         <!-- 搜尋與篩選 -->
@@ -821,7 +825,10 @@
     <!-- 頁尾 -->
     <footer class="border-t-2 py-4 px-3 text-center text-xs sm:text-sm opacity-80" style="border-color: var(--border-color); background-color: var(--bg-card);">
       <p>安心後事通 (HK Afterlife Guide) V1.2 ｜ 積福德・減遺憾・防受騙・零金錢利益 ｜ 資料核實基準：2026 年 11 月</p>
-      <p class="mt-1">所有填寫資料僅儲存在你的瀏覽器本機，不會上傳至任何伺服器。本網站不構成法律或醫療意見。</p>
+      <p class="mt-1">
+        所有填寫資料僅儲存在你的瀏覽器本機，不會上傳至任何伺服器。本網站不構成法律或醫療意見。
+        <button type="button" onclick="openIconModal()" class="underline font-bold ml-1.5" style="color: var(--accent);">🖼️ 取得 512×512 App 圖示</button>
+      </p>
     </footer>
   </div>
 
@@ -882,7 +889,25 @@
   </div>
 
   <!-- =========================================================
-       彈窗 3：自訂確認清除視窗 (絕不用 alert/confirm)
+       彈窗 3：官方 512x512 App 圖示生成器 Modal (方便手機一鍵下載)
+       ========================================================= -->
+  <div id="icon-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-3">
+    <div class="card w-full max-w-md p-5 space-y-4 text-center">
+      <div class="flex items-center justify-between">
+        <h2 class="font-extrabold text-xl">🖼️ 官方 512×512 App 圖示</h2>
+        <button type="button" onclick="closeModal('icon-modal')" class="min-h-[44px] px-3 rounded-xl border-2 font-bold">✕</button>
+      </div>
+      <p class="text-sm opacity-85">專為 PWA、Android 桌面及 Google Play 規格而設（實質解像度 <strong>512×512 PNG</strong>）：</p>
+      <div class="flex justify-center">
+        <img id="generated-icon-img" alt="安心後事通 512x512 App 圖示" class="w-48 h-48 rounded-3xl shadow-lg border-2" style="border-color: var(--border-color);" />
+      </div>
+      <button type="button" onclick="downloadGeneratedIcon()" class="btn-primary w-full py-3">⬇️ 一鍵下載 icon-512.png</button>
+      <p class="text-xs opacity-80">💡 <strong>手機小貼士：</strong>對話內嘅預覽視窗可能會封鎖下載；請先更新 GitHub，再用 <strong>Chrome 打開你自己嘅公開網址</strong>按下載，或者長按上面張圖揀「下載圖片」！</p>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       彈窗 4：自訂確認清除視窗 (絕不用 alert/confirm)
        ========================================================= -->
   <div id="confirm-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-3">
     <div class="card w-full max-w-md p-5 space-y-4">
@@ -904,7 +929,7 @@
   <div id="print-area"></div>
 
   <!-- =========================================================
-       主程式邏輯 (JavaScript — 無內嵌引號風險、完整 9 語、零外洩部署友善)
+       主程式邏輯 (JavaScript — 無內嵌引號風險、完整 9 語、PWA Ready)
        ========================================================= -->
   <script>
     /* ---------------------------------------------------------
@@ -920,6 +945,8 @@
     let pendingClearTarget = null;
     let quizAnswered = {};
     let aiChatHistory = [];
+    let generatedIconDataUrl = '';
+    let generatedIconBlob = null;
     // 用於安全存放動態朗讀文字（徹底根除英文單引號造成 onclick 失效問題）
     let speakRegistry = new Map();
     let speakSeq = 0;
@@ -1719,7 +1746,7 @@
           { type: 'textarea', id: 'heart_words', label: '給家人或親友的心底話（可按 🎤 講粵語自動轉文字）', placeholder: '例如：多謝大家一直以來的照顧，大家要保重身體，喪禮簡簡單單就好...' },
           { type: 'textarea', id: 'other_notes', label: '其他／補充事項（如寵物託付、特別物品交給誰、舊照片位置等）', placeholder: '如沒有其他補充，可留空或填「不適用」' },
           { type: 'text', id: 'sign_name', label: '填寫人姓名／（如手部不便：協助代筆人姓名）', placeholder: '例如：陳大文（本人填寫）', printInSignBox: true },
-          { type: 'text', id: 'sign_date', label: '填寫或最近檢視日期', placeholder: '例如：2026 年 11 月 26 日', printInSignBox: true }
+          { type: 'text', id: 'sign_date', label: '填寫或最近檢視日期', placeholder: '例如：2026 年 11 月 27 日', printInSignBox: true }
         ]
       }
     ];
@@ -1909,10 +1936,9 @@
     ];
 
     /* ---------------------------------------------------------
-       8. 初始化與全域安全事件委派 (徹底根除引號報錯)
+       8. 初始化與全域安全事件委派
        --------------------------------------------------------- */
     window.onload = function () {
-      // 安全綁定靜態朗讀按鈕
       document.getElementById('btn-read-banner').addEventListener('click', () => {
         speakText(document.getElementById('ui-banner-title').innerText + ' ' + document.getElementById('ui-banner-text').innerText);
       });
@@ -1923,7 +1949,6 @@
         speakText(document.getElementById('deaf-giant-display').innerText);
       });
 
-      // 全域事件委派：處理所有動態生成的朗讀按鈕與快捷提問按鈕
       document.addEventListener('click', function (e) {
         const spkBtn = e.target.closest('[data-speak-id]');
         if (spkBtn) {
@@ -2210,7 +2235,7 @@
     }
 
     /* ---------------------------------------------------------
-       11. 外傭與訪港旅客緊急頁渲染 (V1.2 全 9 種語言同步切換)
+       11. 外傭與訪港旅客緊急頁渲染 (全 9 種語言同步切換)
        --------------------------------------------------------- */
     function renderHelperEmergency() {
       const t = I18N[currentLang];
@@ -2257,14 +2282,13 @@
     }
 
     /* ---------------------------------------------------------
-       12. 2026 食環署公眾龕位每月編配日曆 (V1.2 新增本月截止倒數)
+       12. 2026 食環署公眾龕位每月編配日曆
        --------------------------------------------------------- */
     function renderNicheCalendar() {
       const now = new Date();
       const curY = now.getFullYear();
-      const curM = now.getMonth(); // 0..11
+      const curM = now.getMonth();
 
-      // 本月最後一日 17:00
       const endOfCurMonth = new Date(curY, curM + 1, 0, 17, 0, 0);
       const msLeftCur = endOfCurMonth - now;
       const curDeadlineEl = document.getElementById('niche-current-deadline');
@@ -2279,7 +2303,6 @@
       }
       curEndDateEl.innerText = `${curY} 年 ${curM + 1} 月 ${endOfCurMonth.getDate()} 日 17:00 截止`;
 
-      // 下個月 1 號 09:00
       let nextYear = curY;
       let nextMonth = curM + 1;
       if (nextMonth > 11) {
@@ -2349,7 +2372,7 @@
     }
 
     /* ---------------------------------------------------------
-       13. 平安三寶 2026 互動問答邏輯 (修復高對比答錯色彩 & 安全朗讀)
+       13. 平安三寶 2026 互動問答邏輯
        --------------------------------------------------------- */
     function renderQuiz() {
       const container = document.getElementById('quiz-container');
@@ -2409,7 +2432,7 @@
     }
 
     /* ---------------------------------------------------------
-       14. 防騙名錄 & 租車 8 點核對 (高對比安全變數)
+       14. 防騙名錄 & 租車 8 點核對
        --------------------------------------------------------- */
     function renderDirectory() {
       const q = (document.getElementById('dir-search').value || '').trim().toLowerCase();
@@ -2489,7 +2512,6 @@
     /* ---------------------------------------------------------
        15. AI 安心解說員 (9 語安全零成本離線知識庫 + 可選雲端代理)
        --------------------------------------------------------- */
-    // 若日後透過免費 Cloudflare Worker 接駁實時 AI，只須填入安全代理網址；留空則全程零成本使用 9 語核實知識庫
     const OPTIONAL_AI_PROXY_URL = '';
 
     function initAiChat() {
@@ -2563,7 +2585,6 @@
         if (OPTIONAL_AI_PROXY_URL) {
           reply = await callProxyAi(userText);
         } else {
-          // 零費用公開部署預設：快速以 9 國語言核實知識庫回應（0 成本、0 外洩、即時響應）
           await new Promise(r => setTimeout(r, 320));
           reply = smartLocalKnowledgeAnswer(userText, currentLang);
         }
@@ -2595,7 +2616,6 @@
     function smartLocalKnowledgeAnswer(q, lang) {
       const low = q.toLowerCase();
 
-      // 1. 外傭 / 旅客 / 領事館 / 台灣 / 內地急難
       if (/外傭|工人|helper|ofw|pmi|majikan|amo|แม่บ้าน|旅客|tourist|visitor|wisatawan|turista|旅行|여행|นักท่องเที่ยว|領事|consulate|kjri|台灣|台北|内地|內地|999/.test(low)) {
         if (lang === 'en') {
           return '【HK Emergency & Repatriation Guide】\n1. Dial 999 immediately for Police/Ambulance (24/7 English & multi-language interpretation).\n2. Foreign Domestic Helpers (FDH): Under HK\'s Standard Employment Contract, if a helper passes away during employment, the employer is legally responsible for the cost of repatriating the remains and personal belongings. Call HK Labour Dept 24h FDH Hotline: 2157 9537.\n3. Tourists: Contact your Travel Insurance 24h hotline and your Consulate General in HK first before paying commercial deposits.\n4. Anti-Scam: Consulates NEVER ask for personal WhatsApp transfers. (Information only; not formal legal advice.)';
@@ -2624,7 +2644,6 @@
         return '【留港外傭及旅客緊急指引】\n1. 緊急求助請即致電 999（24 小時免費，支援多語言翻譯）。\n2. 外籍家庭傭工（工人姐姐）：按香港標準僱傭合約，若於合約期內不幸身故，僱主有法定責任承擔遺體及個人物品運返原居地之費用；勞工處外傭 24 小時熱線：2157 9537。\n3. 訪港旅客：請先聯絡旅遊保險 24 小時熱線及所屬駐港總領事館（台灣急難救助 6143 9012；內地旅客可致電 999 普通話支援及旅監局 3698 5900）。\n4. 切勿向陌生 WhatsApp 個人戶口轉賬。（僅供一般資訊參考，非正式法律意見）';
       }
 
-      // 2. 平安三寶 2026 / AMD / EPA / 遺產
       if (/平安三寶|平安三宝|醫療指示|医疗指示|預立醫療|2026|amd|epa|651|持久授權|遺囑|遗嘱|平安紙|遺產|遗产|advance medical|will|directive/.test(low)) {
         if (lang === 'en') {
           return '【HK 2026 "Three Peace-of-Mind Documents"】\n1. Advance Medical Directive (AMD): Cap. 651 took effect on 31 July 2026 ("cautious in, easy out"). Requires 2 disinterested witnesses (at least 1 registered HK doctor) and can be uploaded to eHealth.\n2. Enduring Power of Attorney (EPA): Manages finances while alive but mentally incapacitated; automatically terminates upon death. Must be witnessed by a doctor and HK solicitor (within 28 days) and registered at the High Court.\n3. Will: Takes effect after death. Note that the Elder Handover Booklet has NO legal effect; leaving residual estate to charity requires a formal Will (otherwise unclaimed estate goes to the HK Government after 5 years). (Educational only.)';
@@ -2632,7 +2651,6 @@
         return '【香港 2026「平安三寶」重點】\n1. 預設醫療指示 (AMD)：《維持生命治療的預作決定條例》（第 651 章）已於 2026 年 7 月 31 日正式生效，採「慎入易出」原則——須由 2 名無遺產利益見證人（其中 1 名為香港註冊醫生）見證，並可經醫生核實上載至「醫健通 (eHealth)」；清醒時隨時可口頭或書面撤銷。\n2. 持久授權書 (EPA)：處理在生失智時之財務，須由醫生及香港律師（28 日內）見證並向高院註冊；留意當事人離世一刻 EPA 即自動失效！\n3. 平安紙（遺囑）：離世後生效。長者《交帶手冊》絕無法律效力；單身長者如欲將剩餘遺產捐予合法慈善機構，必須訂立正式平安紙，否則無遺囑且無人認領經遺產管理官公告 5 年後歸香港政府。（本回覆只供參考，不構成法律或醫療意見）';
       }
 
-      // 3. 海外失聯 / 獨居代理 / 骨灰暫存 / 綠色殯葬 / 龕位
       if (/海外|獨居|独居|代理|骨灰|暫存|暂存|綠色殯葬|绿色殡葬|龕位|龛位|塔位|遺骨|유골|อัฐิ|ash|niche|fehd|storage/.test(low)) {
         if (lang === 'en') {
           return '【Overseas Family Contingency, Ash Storage & Monthly Niche】\n1. FEHD Official Ash Storage: First 2 months free after cremation, then HK$80/month (Form FEHB 251, Kwai Chung / Wo Hop Shek). Ideal if overseas relatives cannot fly to HK immediately.\n2. 2026 Monthly Public Niche Allocation: Effective 1 Aug 2026, FEHD opens applications from 1st (9 AM) to month-end (5 PM) every month (Standard HK$2,490 / Large HK$3,090). Free public ballot—never pay agents!\n3. Free Green Burial: Garden of Remembrance or sea scattering + "Internet Memorial Service" are 100% free (Register via Form FEHB 278 / greenburial.gov.hk).';
@@ -2640,7 +2658,6 @@
         return '【海外失聯代理、骨灰暫存與 2026 每月龕位】\n1. 獨居代理須生前登記：合法慈善機構（如東華三院 2884 2033、聖雅各福群會 2831 3230、榕光社 2763 9944）須生前正式登記評估方能代辦後事。\n2. 食環署官方骨灰暫存：火化後首 2 個月免費，其後只需 HK$80/月（表格 FEHB 251），非常適合海外家人遇天災或工作暫未能回港時作過渡。\n3. 2026 年 8 月起公眾龕位每月編配：每月 1 日上午 9 時至月底下午 5 時接受網上免費申請（涵蓋和合石第六期、哥連臣角新廈、石門、曾咀；標準 $2,490／大型 $3,090）。\n4. 逾時終極備案：可免費登記食環署《綠色殯葬中央登記名冊》(FEHB 278)，完全免費。（本回覆只供資訊參考）';
       }
 
-      // 4. 防騙 / 查冊 / 宗教 / 慈善機構
       if (/防騙|防骗|防詐|受騙|查冊|查册|殮葬|殡仪|葬儀|慈善|scam|verify|charity|penipuan|มิจฉาชีพ|사기|詐欺/.test(low)) {
         if (lang === 'en') {
           return '【10-Second HK Anti-Scam Verification】\n1. Licensed Undertakers: Check FEHD official list (fehd.gov.hk / Tel 2868 0000). Always demand itemized written quotations.\n2. Legal Charities: Verify Section 88 tax-exempt status on IRD website (ird.gov.hk/chi/tax/ach_index.htm).\n3. Private Niches: Check valid licence at Private Columbaria Affairs Office (rpc.gov.hk).\n4. Suspected Scam: Call HK Police Anti-Scam Helpline 18222 or check Scameter (cyberdefender.hk/scameter/).';
@@ -2648,7 +2665,6 @@
         return '【香港善終 10 秒防騙核實步驟】\n1. 查持牌殮葬商：登入食環署網站查核《持牌殮葬商名單》（熱線 2868 0000），堅持要書面分項報價，拒絕醫院走廊兜客。\n2. 查合法慈善機構：登入稅務局《稅務條例》第 88 條認可慈善名單（ird.gov.hk）核實真偽，絕不轉賬至陌生個人戶口。\n3. 查私營龕場牌照：登入私營骨灰安置所事務辦事處（rpc.gov.hk）核實是否持有效正式牌照；公眾龕位絕無「收錢打尖」。\n4. 即時驗騙案：致電警方 24 小時防騙易 18222 或用「防騙視伏器」(cyberdefender.hk/scameter/)。';
       }
 
-      // 預設總覽導航回覆
       if (lang === 'en') {
         return 'Thank you for asking! You can ask me about:\n• 2026 HK Advance Medical Directive (Cap. 651) & Will / EPA\n• Overseas family ash storage (HK$80/mo) & Monthly Public Niche ballot\n• Domestic Helper (FDH) & Tourist emergency steps (999, Consulates, Repatriation)\n• 10-second Anti-Scam verification (FEHD, IRD Sec. 88, Police 18222)\n(This platform is 100% zero-profit; information is for reference only.)';
       }
@@ -2674,7 +2690,7 @@
       ELDER_SCHEMA.forEach(sec => {
         html += `<div class="print-section"><h2 style="font-size:15pt; font-weight:900; margin:0 0 3mm 0;">${sec.title}</h2>`;
         sec.fields.forEach(f => {
-          if (f.printInSignBox) return; // 交由底部專屬核實簽署欄統一列印，避免重覆
+          if (f.printInSignBox) return;
           if (f.type === 'multi' || f.type === 'single') {
             const vals = elderData.selections[f.id] || [];
             html += `<div style="margin-bottom:3.5mm;"><div style="font-weight:700; margin-bottom:2mm;">${f.label} ${f.type === 'multi' ? '（可多項剔取）' : '（單選）'}</div>`;
@@ -2753,7 +2769,7 @@
     }
 
     /* ---------------------------------------------------------
-       17. 多語言切換、無障礙控制、語音輸入／朗讀、QR、Modal
+       17. 多語言切換、無障礙控制、語音輸入／朗讀、QR、App 圖示生成
        --------------------------------------------------------- */
     function setLanguage(lang) {
       currentLang = I18N[lang] ? lang : 'zh-HK';
@@ -2792,10 +2808,8 @@
       document.getElementById('ui-ai-title').innerText = t.aiTitle;
       document.getElementById('ui-ai-desc').innerText = t.aiDesc;
 
-      // 重新渲染外傭及旅客緊急頁（套用新語言）
       renderHelperEmergency();
 
-      // 更新聽障預設句與初始大字板
       const presetGrid = document.getElementById('deaf-preset-grid');
       if (presetGrid && t.deafPresets) {
         document.getElementById('deaf-giant-display').innerText = t.deafPresets[0];
@@ -2898,7 +2912,7 @@
     function openQrModal() {
       const modal = document.getElementById('qr-modal');
       modal.classList.remove('hidden');
-      const url = window.location.href.startsWith('http') ? window.location.href : 'https://hk-afterlife-guide.pages.dev';
+      const url = window.location.href.startsWith('http') ? window.location.href : 'https://ign982-hub.github.io/Usernetworktree/';
       document.getElementById('qr-url-preview').innerText = url;
 
       const box = document.getElementById('qrcode-box');
@@ -2914,17 +2928,95 @@
       }
     }
 
-    function copyShareUrl() {
-      const url = document.getElementById('qr-url-preview').innerText;
-      copyTextToClipboard(`【安心後事通 HK Afterlife Guide】免費香港善終防騙與長者手冊工具：${url}`, '已複製分享連結！可直接貼到 WhatsApp。');
+    /* 繪製 512x512 公益主題官方 PNG App 圖示 (符合 Android Maskable 安全區) */
+    function openIconModal() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      // 滿版深青綠底色 (安全支援任何圓角或圓形裁切)
+      const grad = ctx.createLinearGradient(0, 0, 512, 512);
+      grad.addColorStop(0, '#0F766E');
+      grad.addColorStop(1, '#115E59');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 512, 512);
+
+      // 安全區內淡金色圓環
+      ctx.beginPath();
+      ctx.arc(256, 256, 186, 0, Math.PI * 2);
+      ctx.fillStyle = '#FAF8F5';
+      ctx.fill();
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = '#FDE047';
+      ctx.stroke();
+
+      // 暖心標誌 (簡約守護心形)
+      ctx.save();
+      ctx.translate(256, 152);
+      ctx.fillStyle = '#0F766E';
+      ctx.beginPath();
+      ctx.moveTo(0, 34);
+      ctx.bezierCurveTo(-48, -6, -54, -46, -24, -52);
+      ctx.bezierCurveTo(-8, -56, 0, -40, 0, -32);
+      ctx.bezierCurveTo(0, -40, 8, -56, 24, -52);
+      ctx.bezierCurveTo(54, -46, 48, -6, 0, 34);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // 主標題「安心」與副標「後事通」
+      ctx.fillStyle = '#0F766E';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = '900 92px "Noto Sans TC", sans-serif';
+      ctx.fillText('安心', 256, 266);
+
+      ctx.fillStyle = '#334155';
+      ctx.font = '700 44px "Noto Sans TC", sans-serif';
+      ctx.fillText('後事通', 256, 354);
+
+      generatedIconDataUrl = canvas.toDataURL('image/png');
+      canvas.toBlob((blob) => { generatedIconBlob = blob; }, 'image/png');
+      document.getElementById('generated-icon-img').src = generatedIconDataUrl;
+      document.getElementById('icon-modal').classList.remove('hidden');
+    }
+
+    function downloadGeneratedIcon() {
+      if (!generatedIconBlob && !generatedIconDataUrl) return;
+      try {
+        const url = generatedIconBlob ? URL.createObjectURL(generatedIconBlob) : generatedIconDataUrl;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'icon-512.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        if (generatedIconBlob) {
+          setTimeout(() => URL.revokeObjectURL(url), 5000);
+        }
+        showToast('已開始下載 icon-512.png！請喺手機「下載」資料夾搵返。');
+      } catch (e) {
+        showToast('請先用 Chrome 打開你嘅公開網站再按下載。');
+      }
+    }
+
+    /* ---------------------------------------------------------
+       18. 彈窗關閉、清除確認、剪貼簿複製與通用工具函式
+       --------------------------------------------------------- */
+    function closeModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.add('hidden');
     }
 
     function requestClearData(target) {
       pendingClearTarget = target;
-      document.getElementById('confirm-modal-msg').innerText =
-        target === 'elder'
-          ? '確定清除本機已填寫的《長者安心交帶手冊》全部內容？建議先按「A4 特大字列印」留底。'
-          : '確定重設《家屬 5 階段清單》所有剔選及備忘紀錄？';
+      const msgEl = document.getElementById('confirm-modal-msg');
+      if (msgEl) {
+        msgEl.innerText = target === 'elder'
+          ? '確定要清除《我的安心交帶手冊》全部已填寫內容？建議先按「A4 特大字列印」留底。'
+          : '確定要重設《家屬辦理清單》全部進度與備忘？建議先複製報告到 WhatsApp 留底。';
+      }
       document.getElementById('confirm-modal').classList.remove('hidden');
     }
 
@@ -2933,29 +3025,31 @@
         elderData = { selections: {}, texts: {} };
         safeSave(STORAGE_KEY_ELDER, elderData);
         renderElderForm();
-        showToast('已清除長者手冊紀錄。');
+        showToast('已清除長者手冊全部紀錄。');
       } else if (pendingClearTarget === 'family') {
         familyData = { statuses: {}, notes: '' };
         safeSave(STORAGE_KEY_FAMILY, familyData);
+        const notesEl = document.getElementById('family-notes');
+        if (notesEl) notesEl.value = '';
         renderFamilyChecklist();
-        showToast('已重設家屬辦理清單。');
+        showToast('已重設家屬辦理清單進度。');
       }
       pendingClearTarget = null;
       closeModal('confirm-modal');
     }
 
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
+    function copyShareUrl() {
+      const url = window.location.href.startsWith('http') ? window.location.href : 'https://ign982-hub.github.io/Usernetworktree/';
+      copyTextToClipboard(url, '已複製網站連結！可直接貼給 WhatsApp 親友。');
     }
 
-    /* ---------------------------------------------------------
-       18. 工具函式 (雙重剪貼簿支援、吐司、HTML 轉義)
-       --------------------------------------------------------- */
     function copyTextToClipboard(text, successMsg) {
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(text)
-          .then(() => showToast(successMsg || '已複製到剪貼簿！'))
-          .catch(() => fallbackCopy(text, successMsg));
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(successMsg || '已複製到剪貼簿！');
+        }).catch(() => {
+          fallbackCopy(text, successMsg);
+        });
       } else {
         fallbackCopy(text, successMsg);
       }
@@ -2997,6 +3091,15 @@
 
     function escapeAttr(str) {
       return escapeHtml(str).replace(/'/g, '&#39;').replace(/\n/g, ' ');
+    }
+
+    /* ---------------------------------------------------------
+       19. 註冊 PWA Service Worker (支援離線與 PWABuilder 打包)
+       --------------------------------------------------------- */
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
     }
   </script>
 </body>
