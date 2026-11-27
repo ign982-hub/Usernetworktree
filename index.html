@@ -84,6 +84,7 @@
 
     body.font-lg { --font-scale: 1.18; }
     body.font-xl { --font-scale: 1.35; }
+    body.tts-active { padding-bottom: 112px; }
 
     .card {
       background-color: var(--bg-card);
@@ -246,6 +247,11 @@
       color: #FFFFFF !important;
     }
 
+    /* 底部朗讀遙控條啟動時，自動把浮動 AI 掣移高避免重疊 */
+    body.tts-active #floating-ai-btn {
+      bottom: 6.75rem;
+    }
+
     /* =========================================================
        A4 專用列印樣式 (10mm x 10mm 粗黑方格，方便長者手寫打剔)
        ========================================================= */
@@ -262,8 +268,9 @@
         color: #000000 !important;
         font-size: 13pt !important;
         line-height: 1.5 !important;
+        padding-bottom: 0 !important;
       }
-      #app-shell, #floating-ai-btn, #toast-container, .modal-backdrop {
+      #app-shell, #floating-ai-btn, #toast-container, #tts-control-bar, .modal-backdrop {
         display: none !important;
       }
       #print-area {
@@ -840,6 +847,38 @@
   </button>
 
   <!-- =========================================================
+       底部常駐「語音朗讀遙控條」(支援中途暫停／繼續／即時停止／實時變速)
+       ========================================================= -->
+  <div id="tts-control-bar" class="hidden fixed bottom-0 left-0 right-0 z-40 shadow-2xl border-t-4 px-3 py-2.5"
+    style="background-color: var(--bg-card); border-color: var(--accent);">
+    <div class="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <span id="tts-status-icon" class="text-xl shrink-0">🔊</span>
+        <div class="leading-tight truncate">
+          <div id="tts-status-text" class="font-extrabold text-sm sm:text-base truncate">正在朗讀中...</div>
+          <div id="tts-progress-sub" class="text-xs opacity-80">第 1 / 1 段</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button type="button" id="tts-bar-rate-btn" onclick="toggleSpeechRate()"
+          class="min-h-[46px] px-3 rounded-xl border-2 font-bold text-sm"
+          style="background-color: var(--bg-soft); border-color: var(--border-color); color: var(--text-main);">
+          0.75x
+        </button>
+        <button type="button" id="tts-pause-btn" onclick="togglePauseSpeech()"
+          class="min-h-[46px] px-4 rounded-xl font-bold text-sm"
+          style="background-color: var(--accent); color: var(--btn-active-text);">
+          ⏸️ 暫停
+        </button>
+        <button type="button" id="tts-stop-btn" onclick="stopSpeech(true)"
+          class="min-h-[46px] px-4 rounded-xl font-bold text-sm bg-red-600 text-white">
+          ⏹️ 停止
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
        彈窗 1：聽障無聲大字溝通卡 + 雙語緊急求助卡 Modal
        ========================================================= -->
   <div id="deaf-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-3">
@@ -920,8 +959,8 @@
     </div>
   </div>
 
-  <!-- 輕量提示吐司 (Toast Container) -->
-  <div id="toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 space-y-2 pointer-events-none"></div>
+  <!-- 單一不重疊輕量提示吐司 (固定於底部上方，絕不遮擋頂部按鈕) -->
+  <div id="toast-container" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-max max-w-[90vw] pointer-events-none"></div>
 
   <!-- =========================================================
        專用 A4 列印視區 (#print-area)
@@ -929,7 +968,7 @@
   <div id="print-area"></div>
 
   <!-- =========================================================
-       主程式邏輯 (JavaScript — 無內嵌引號風險、完整 9 語、PWA Ready)
+       主程式邏輯 (JavaScript — Android 逐句朗讀引擎、無重疊提示、完整 9 語)
        ========================================================= -->
   <script>
     /* ---------------------------------------------------------
@@ -947,7 +986,17 @@
     let aiChatHistory = [];
     let generatedIconDataUrl = '';
     let generatedIconBlob = null;
-    // 用於安全存放動態朗讀文字（徹底根除英文單引號造成 onclick 失效問題）
+    let toastTimer = null;
+
+    // 逐句朗讀引擎狀態 (解決 Android Chrome pause() 失效及無法即時變速問題)
+    const ttsState = {
+      status: 'idle', // 'idle' | 'playing' | 'paused'
+      chunks: [],
+      index: 0,
+      sessionId: 0
+    };
+
+    // 安全存放動態朗讀文字（根除英文單引號造成 onclick 失效）
     let speakRegistry = new Map();
     let speakSeq = 0;
 
@@ -980,7 +1029,7 @@
     }
 
     /* ---------------------------------------------------------
-       2. 完整 9 國語言翻譯字典 (含外傭・旅客詳細步驟與按鈕)
+       2. 完整 9 國語言翻譯字典 (含朗讀控制按鈕及外傭・旅客詳細步驟)
        --------------------------------------------------------- */
     const I18N = {
       'zh-HK': {
@@ -992,6 +1041,12 @@
         readAloud: '朗讀',
         rateSlow: '0.75x 慢讀',
         rateNormal: '1.0x 正常',
+        ttsPlaying: '正在朗讀中',
+        ttsPaused: '已暫停朗讀',
+        ttsPauseBtn: '⏸️ 暫停',
+        ttsResumeBtn: '▶️ 繼續',
+        ttsStopBtn: '⏹️ 停止',
+        ttsStoppedMsg: '⏹️ 已停止朗讀',
         fabAi: '問 AI 解說員',
         aiSend: '發送提問 ➤',
         aiPlaceholder: '輸入問題，或按 🎤 直接講出你想問的事...',
@@ -1059,6 +1114,12 @@
         readAloud: '朗读',
         rateSlow: '0.75x 慢读',
         rateNormal: '1.0x 正常',
+        ttsPlaying: '正在朗读中',
+        ttsPaused: '已暂停朗读',
+        ttsPauseBtn: '⏸️ 暂停',
+        ttsResumeBtn: '▶️ 继续',
+        ttsStopBtn: '⏹️ 停止',
+        ttsStoppedMsg: '⏹️ 已停止朗读',
         fabAi: '问 AI 解说员',
         aiSend: '发送提问 ➤',
         aiPlaceholder: '输入问题，或按 🎤 直接说出您想问的事...',
@@ -1125,6 +1186,12 @@
         readAloud: '朗讀',
         rateSlow: '0.75x 慢讀',
         rateNormal: '1.0x 正常',
+        ttsPlaying: '正在朗讀中',
+        ttsPaused: '已暫停朗讀',
+        ttsPauseBtn: '⏸️ 暫停',
+        ttsResumeBtn: '▶️ 繼續',
+        ttsStopBtn: '⏹️ 停止',
+        ttsStoppedMsg: '⏹️ 已停止朗讀',
         fabAi: '問 AI 解說員',
         aiSend: '送出提問 ➤',
         aiPlaceholder: '輸入問題，或按 🎤 直接用國語講出您想問的事...',
@@ -1191,6 +1258,12 @@
         readAloud: 'Listen',
         rateSlow: '0.75x Slow',
         rateNormal: '1.0x Normal',
+        ttsPlaying: 'Reading aloud',
+        ttsPaused: 'Paused',
+        ttsPauseBtn: '⏸️ Pause',
+        ttsResumeBtn: '▶️ Resume',
+        ttsStopBtn: '⏹️ Stop',
+        ttsStoppedMsg: '⏹️ Reading stopped',
         fabAi: 'Ask AI Guide',
         aiSend: 'Send ➤',
         aiPlaceholder: 'Type your question or tap 🎤 to speak...',
@@ -1258,6 +1331,12 @@
         readAloud: 'Dengar',
         rateSlow: '0.75x Pelan',
         rateNormal: '1.0x Normal',
+        ttsPlaying: 'Sedang membaca',
+        ttsPaused: 'Dijeda',
+        ttsPauseBtn: '⏸️ Jeda',
+        ttsResumeBtn: '▶️ Lanjut',
+        ttsStopBtn: '⏹️ Stop',
+        ttsStoppedMsg: '⏹️ Pembacaan dihentikan',
         fabAi: 'Tanya AI',
         aiSend: 'Kirim ➤',
         aiPlaceholder: 'Ketik pertanyaan atau tekan 🎤 untuk berbicara...',
@@ -1325,6 +1404,12 @@
         readAloud: 'Pakinggan',
         rateSlow: '0.75x Mabagal',
         rateNormal: '1.0x Normal',
+        ttsPlaying: 'Nagbabasa',
+        ttsPaused: 'Naka-pause',
+        ttsPauseBtn: '⏸️ Pause',
+        ttsResumeBtn: '▶️ Ituloy',
+        ttsStopBtn: '⏹️ Ihinto',
+        ttsStoppedMsg: '⏹️ Hininto ang pagbabasa',
         fabAi: 'Magtanong sa AI',
         aiSend: 'Ipadala ➤',
         aiPlaceholder: 'Isulat ang tanong o pindutin ang 🎤...',
@@ -1392,6 +1477,12 @@
         readAloud: '読み上げ',
         rateSlow: '0.75x ゆっくり',
         rateNormal: '1.0x 標準',
+        ttsPlaying: '読み上げ中',
+        ttsPaused: '一時停止中',
+        ttsPauseBtn: '⏸️ 一時停止',
+        ttsResumeBtn: '▶️ 再開',
+        ttsStopBtn: '⏹️ 停止',
+        ttsStoppedMsg: '⏹️ 読み上げを停止しました',
         fabAi: 'AI案内員に質問',
         aiSend: '送信 ➤',
         aiPlaceholder: '質問を入力、または 🎤 で音声入力...',
@@ -1458,6 +1549,12 @@
         readAloud: '음성듣기',
         rateSlow: '0.75x 느리게',
         rateNormal: '1.0x 보통',
+        ttsPlaying: '읽어주는 중',
+        ttsPaused: '일시정지됨',
+        ttsPauseBtn: '⏸️ 일시정지',
+        ttsResumeBtn: '▶️ 계속듣기',
+        ttsStopBtn: '⏹️ 정지',
+        ttsStoppedMsg: '⏹️ 음성 듣기를 정지했습니다',
         fabAi: 'AI 안내원 질문',
         aiSend: '보내기 ➤',
         aiPlaceholder: '질문을 입력하거나 🎤 버튼을 눌러 말씀하세요...',
@@ -1524,6 +1621,12 @@
         readAloud: 'ฟังเสียง',
         rateSlow: '0.75x ช้า',
         rateNormal: '1.0x ปกติ',
+        ttsPlaying: 'กำลังอ่านออกเสียง',
+        ttsPaused: 'หยุดชั่วคราว',
+        ttsPauseBtn: '⏸️ พัก',
+        ttsResumeBtn: '▶️ ต่อ',
+        ttsStopBtn: '⏹️ หยุด',
+        ttsStoppedMsg: '⏹️ หยุดการอ่านแล้ว',
         fabAi: 'ถามผู้ช่วย AI',
         aiSend: 'ส่งคำถาม ➤',
         aiPlaceholder: 'พิมพ์คำถาม หรือกด 🎤 เพื่อพูด...',
@@ -1948,6 +2051,8 @@
       document.getElementById('btn-read-deaf').addEventListener('click', () => {
         speakText(document.getElementById('deaf-giant-display').innerText);
       });
+
+      window.addEventListener('beforeunload', () => stopSpeech(false));
 
       document.addEventListener('click', function (e) {
         const spkBtn = e.target.closest('[data-speak-id]');
@@ -2769,9 +2874,10 @@
     }
 
     /* ---------------------------------------------------------
-       17. 多語言切換、無障礙控制、語音輸入／朗讀、QR、App 圖示生成
+       17. 多語言切換、無障礙控制、Android 逐句朗讀引擎、QR、App 圖示生成
        --------------------------------------------------------- */
     function setLanguage(lang) {
+      stopSpeech(false);
       currentLang = I18N[lang] ? lang : 'zh-HK';
       applyLanguageUI();
       initAiChat();
@@ -2809,6 +2915,7 @@
       document.getElementById('ui-ai-desc').innerText = t.aiDesc;
 
       renderHelperEmergency();
+      updateTtsBarUI();
 
       const presetGrid = document.getElementById('deaf-preset-grid');
       if (presetGrid && t.deafPresets) {
@@ -2844,11 +2951,79 @@
       updateFontButtons(activeFont);
     }
 
+    /* 將長段落拆成自然短句，確保 Android 手機可即時暫停、取消及變速 */
+    function splitTextIntoChunks(text) {
+      const cleaned = String(text || '').replace(/\s+/g, ' ').trim();
+      if (!cleaned) return [];
+      const rawSentences = cleaned.match(/[^。！？；.!?\n]+[。！？；.!?\n]*/g) || [cleaned];
+      const chunks = [];
+      rawSentences.forEach(s => {
+        const part = s.trim();
+        if (!part) return;
+        if (part.length > 48) {
+          const subParts = part.match(/[^，、,;：:]+[，、,;：:]*/g) || [part];
+          subParts.forEach(sp => {
+            if (sp.trim()) chunks.push(sp.trim());
+          });
+        } else {
+          chunks.push(part);
+        }
+      });
+      return chunks.length ? chunks : [cleaned];
+    }
+
+    function updateTtsBarUI() {
+      const t = I18N[currentLang];
+      const bar = document.getElementById('tts-control-bar');
+      const rateBtn = document.getElementById('tts-bar-rate-btn');
+      const pauseBtn = document.getElementById('tts-pause-btn');
+      const stopBtn = document.getElementById('tts-stop-btn');
+      const statusIcon = document.getElementById('tts-status-icon');
+      const statusText = document.getElementById('tts-status-text');
+      const progressSub = document.getElementById('tts-progress-sub');
+
+      const rateLabel = speechRate === 0.75 ? t.rateSlow : t.rateNormal;
+      document.getElementById('ui-rate-label').innerText = rateLabel;
+      if (rateBtn) rateBtn.innerText = `${speechRate}x`;
+      if (stopBtn) stopBtn.innerText = t.ttsStopBtn || '⏹️ 停止';
+
+      if (ttsState.status === 'idle') {
+        bar.classList.add('hidden');
+        document.body.classList.remove('tts-active');
+        return;
+      }
+
+      bar.classList.remove('hidden');
+      document.body.classList.add('tts-active');
+
+      const total = Math.max(1, ttsState.chunks.length);
+      const currentNum = Math.min(total, ttsState.index + 1);
+      if (progressSub) progressSub.innerText = `${currentNum} / ${total}`;
+
+      if (ttsState.status === 'playing') {
+        if (statusIcon) statusIcon.innerText = '🔊';
+        if (statusText) statusText.innerText = `${t.ttsPlaying || '正在朗讀中'} (${speechRate}x)`;
+        if (pauseBtn) pauseBtn.innerText = t.ttsPauseBtn || '⏸️ 暫停';
+      } else {
+        if (statusIcon) statusIcon.innerText = '⏸️';
+        if (statusText) statusText.innerText = `${t.ttsPaused || '已暫停朗讀'} (${speechRate}x)`;
+        if (pauseBtn) pauseBtn.innerText = t.ttsResumeBtn || '▶️ 繼續';
+      }
+    }
+
     function toggleSpeechRate() {
       speechRate = speechRate === 0.75 ? 1.0 : 0.75;
       const t = I18N[currentLang];
-      document.getElementById('ui-rate-label').innerText = speechRate === 0.75 ? t.rateSlow : t.rateNormal;
-      showToast(`🔊 ${speechRate}x`);
+      const rateLabel = speechRate === 0.75 ? t.rateSlow : t.rateNormal;
+      updateTtsBarUI();
+      showToast(`🔊 ${rateLabel}`);
+
+      // 若正在朗讀中，立即以新語速重讀目前該句（即時生效！）
+      if (ttsState.status === 'playing' && ttsState.chunks.length > 0) {
+        ttsState.sessionId++;
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+        speakCurrentChunk(ttsState.sessionId);
+      }
     }
 
     function speakText(text) {
@@ -2856,15 +3031,86 @@
         showToast('此瀏覽器暫不支援語音朗讀功能。');
         return;
       }
+      const chunks = splitTextIntoChunks(text);
+      if (!chunks.length) return;
+
+      ttsState.sessionId++;
+      ttsState.chunks = chunks;
+      ttsState.index = 0;
+      ttsState.status = 'playing';
+
       try {
         window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
+      } catch (e) {}
+
+      updateTtsBarUI();
+      speakCurrentChunk(ttsState.sessionId);
+    }
+
+    function speakCurrentChunk(sessionId) {
+      if (sessionId !== ttsState.sessionId || ttsState.status !== 'playing') return;
+
+      if (ttsState.index >= ttsState.chunks.length) {
+        ttsState.status = 'idle';
+        ttsState.chunks = [];
+        ttsState.index = 0;
+        updateTtsBarUI();
+        return;
+      }
+
+      updateTtsBarUI();
+      try {
+        const utter = new SpeechSynthesisUtterance(ttsState.chunks[ttsState.index]);
         utter.lang = I18N[currentLang].speechLang || 'zh-HK';
         utter.rate = speechRate;
+
+        utter.onend = function () {
+          if (sessionId !== ttsState.sessionId || ttsState.status !== 'playing') return;
+          ttsState.index++;
+          speakCurrentChunk(sessionId);
+        };
+
+        utter.onerror = function (ev) {
+          if (sessionId !== ttsState.sessionId) return;
+          // 忽略主動 cancel 引發的中斷事件
+          if (ev && (ev.error === 'canceled' || ev.error === 'interrupted')) return;
+          ttsState.status = 'idle';
+          updateTtsBarUI();
+        };
+
         window.speechSynthesis.speak(utter);
-        showToast(`🔊 正在朗讀 (${speechRate}x)...`);
       } catch (e) {
+        ttsState.status = 'idle';
+        updateTtsBarUI();
         showToast('語音朗讀啟動失敗，請檢查裝置音量設定。');
+      }
+    }
+
+    function togglePauseSpeech() {
+      if (ttsState.status === 'playing') {
+        ttsState.sessionId++;
+        ttsState.status = 'paused';
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+        updateTtsBarUI();
+      } else if (ttsState.status === 'paused') {
+        ttsState.sessionId++;
+        ttsState.status = 'playing';
+        updateTtsBarUI();
+        speakCurrentChunk(ttsState.sessionId);
+      }
+    }
+
+    function stopSpeech(notify) {
+      ttsState.sessionId++;
+      ttsState.status = 'idle';
+      ttsState.chunks = [];
+      ttsState.index = 0;
+      try {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      } catch (e) {}
+      updateTtsBarUI();
+      if (notify) {
+        showToast(I18N[currentLang].ttsStoppedMsg || '⏹️ 已停止朗讀');
       }
     }
 
@@ -2874,6 +3120,7 @@
         showToast('此瀏覽器暫不支援即時語音輸入，請使用手機鍵盤麥克風或直接打字。');
         return;
       }
+      stopSpeech(false);
       try {
         const rec = new SpeechRec();
         rec.lang = I18N[currentLang].speechLang || 'zh-HK';
@@ -2935,14 +3182,12 @@
       canvas.height = 512;
       const ctx = canvas.getContext('2d');
 
-      // 滿版深青綠底色 (安全支援任何圓角或圓形裁切)
       const grad = ctx.createLinearGradient(0, 0, 512, 512);
       grad.addColorStop(0, '#0F766E');
       grad.addColorStop(1, '#115E59');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 512, 512);
 
-      // 安全區內淡金色圓環
       ctx.beginPath();
       ctx.arc(256, 256, 186, 0, Math.PI * 2);
       ctx.fillStyle = '#FAF8F5';
@@ -2951,7 +3196,6 @@
       ctx.strokeStyle = '#FDE047';
       ctx.stroke();
 
-      // 暖心標誌 (簡約守護心形)
       ctx.save();
       ctx.translate(256, 152);
       ctx.fillStyle = '#0F766E';
@@ -2965,7 +3209,6 @@
       ctx.fill();
       ctx.restore();
 
-      // 主標題「安心」與副標「後事通」
       ctx.fillStyle = '#0F766E';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -3002,7 +3245,7 @@
     }
 
     /* ---------------------------------------------------------
-       18. 彈窗關閉、清除確認、剪貼簿複製與通用工具函式
+       18. 彈窗關閉、清除確認、剪貼簿複製與單一不重疊吐司提示
        --------------------------------------------------------- */
     function closeModal(modalId) {
       const el = document.getElementById(modalId);
@@ -3073,12 +3316,21 @@
 
     function showToast(msg) {
       const container = document.getElementById('toast-container');
+      if (!container) return;
+      if (toastTimer) {
+        clearTimeout(toastTimer);
+        toastTimer = null;
+      }
+      container.innerHTML = '';
       const el = document.createElement('div');
-      el.className = 'px-4 py-2.5 rounded-xl shadow-lg font-bold text-sm text-white pointer-events-auto';
+      el.className = 'px-4 py-2.5 rounded-xl shadow-lg font-bold text-sm text-white text-center pointer-events-auto';
       el.style.backgroundColor = '#0F172A';
       el.innerText = msg;
       container.appendChild(el);
-      setTimeout(() => el.remove(), 3200);
+      toastTimer = setTimeout(() => {
+        container.innerHTML = '';
+        toastTimer = null;
+      }, 2400);
     }
 
     function escapeHtml(str) {
